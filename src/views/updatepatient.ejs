@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update User</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/home.css">
+    <script src="/js/jquery-3.7.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .form-control {
+            border-radius: 0.375rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group .invalid-feedback {
+            display: none;
+        }
+
+        .form-group input:invalid~.invalid-feedback {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="header">Update User</h1>
+        <form action="/api/v1/user/update/<%= user._id %>?_method=PUT" method="post">
+            <!-- Email -->
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" class="form-control" value="<%= user.email %>" required />
+            </div>
+
+            <!-- First Name -->
+            <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" name="firstName" class="form-control" value="<%= user.firstName %>"
+                    required />
+            </div>
+
+            <!-- Last Name -->
+            <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" name="lastName" class="form-control" value="<%= user.lastName %>"
+                    required />
+            </div>
+
+            <!-- New Password -->
+            <div class="form-group">
+                <label for="password">New Password</label>
+                <input type="password" id="password" name="password" class="form-control"
+                    placeholder="Enter new password" required />
+            </div>
+
+            <!-- Confirm New Password -->
+            <div class="form-group">
+                <label for="confirmPassword">Confirm New Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control"
+                    placeholder="Confirm new password" required />
+                <div class="invalid-feedback">
+                    Passwords do not match.
+                </div>
+            </div>
+
+            <!-- Doctor Selection -->
+            <div class="form-group">
+                <label for="doctorId">Assign Doctor</label>
+                <select id="doctorId" name="doctorId" class="form-control">
+                    <option value="">Select a Doctor</option>
+
+                </select>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+            <div class="form-group">
+                <a href="/api/v1/user/admin/dashboard" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+    <script>
+        $(document).ready(function () {
+            const token = localStorage.getItem('token');
+
+            if (token) {
+                $.ajax({
+                    url: '/api/v1/user/admin/dashboard',
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    success: function (res) {
+                        console.log('User data:', res);
+                    },
+                    error: function (xhr) {
+                        console.error('Error:', xhr.responseText);
+                    }
+                });
+                // Fetch list of doctors for the select dropdown
+                $.ajax({
+                    url: '/api/v1/user/doctors',  // Assuming this endpoint returns a list of doctors
+                    method: 'GET',
+                    success: function (doctors) {
+                        doctors.forEach(function (doctor) {
+                            // Create a new option element for each doctor
+                            const option = `<option value="${doctor._id}">${doctor.firstName} ${doctor.lastName}</option>`;
+                            $('#doctorId').append(option);
+                        });
+                    },
+                    error: function (xhr) {
+                        console.error('Error fetching doctors:', xhr.responseText);
+                    }
+                });
+            } else {
+                console.log('Token not found, please log in');
+                window.location.href = '/api/v1/auth';
+            }
+        });
+    </script>
+    <script>
+        // Kiểm tra xem mật khẩu và xác nhận mật khẩu có khớp không
+        $(document).ready(function () {
+            $("form").on("submit", function (event) {
+                var password = $("#password").val();
+                var confirmPassword = $("#confirmPassword").val();
+
+                if (password !== confirmPassword) {
+                    event.preventDefault();  // Ngừng gửi form
+                    alert("Passwords do not match.");
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

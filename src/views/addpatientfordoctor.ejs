@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Patient</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <script src="/js/jquery-3.7.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <style>
+        .container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Create New Patient</h2>
+        <form id="addPatientForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" class="form-control" required />
+            </div>
+            <!-- Doctor Selection -->
+            <div class="form-group">
+                <label for="doctorId">Assign Doctor</label>
+                <select id="doctorId" name="doctorId" class="form-control" required>
+                    <option value="">Select a Doctor</option>
+                    <!-- Doctors will be added here dynamically -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="deviceID">Device ID</label>
+                <input type="text" id="deviceID" class="form-control" required />
+            </div>
+
+            <div class="form-group">
+                <label for="role">Role</label>
+                <select id="role" class="form-control" required>
+                    <option value="3">Patient</option> <!-- Only option available for the role -->
+                </select>
+            </div>
+
+            <!-- Additional Health Data Fields -->
+            <div class="form-group">
+                <label for="heartBeat">Heart Beat (BPM)</label>
+                <input type="number" id="heartBeat" class="form-control" value="0" />
+            </div>
+            <div class="form-group">
+                <label for="spo2">SpO2 (%)</label>
+                <input type="number" id="spo2" class="form-control" value="0" />
+            </div>
+            <div class="form-group">
+                <label for="bodyTemp">Body Temperature (°C)</label>
+                <input type="number" id="bodyTemp" class="form-control" value="0" />
+            </div>
+            <div class="form-group">
+                <label for="ambientTemp">Ambient Temperature (°C)</label>
+                <input type="number" id="ambientTemp" class="form-control" value="0" />
+            </div>
+            <div class="form-group">
+                <label for="healthDiagnosis">Health Diagnosis</label>
+                <input type="text" id="healthDiagnosis" class="form-control" value="Normal" />
+            </div>
+            <div class="form-group">
+                <label for="healthStatus">Health Status</label>
+                <input type="text" id="healthStatus" class="form-control" value="Healthy" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create Patient</button>
+        </form>
+<<<<<<< HEAD
+        <div class="card shadow-lg mb-4">
+
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Real-Time Health Data</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Device ID</th>
+                            <th>Heart Beat</th>
+                            <th>SpO2</th>
+                            <th>Body Temperature</th>
+                            <th>Ambient Temperature</th>
+                            <th>Health Diagnosis</th>
+                            <th>Health Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="deviceID">N/A</td>
+                            <td id="heartBeat">0 BPM</td>
+                            <td id="spo2">0%</td>
+                            <td id="bodyTemp">N/A</td>
+                            <td id="ambientTemp">N/A</td>
+                            <td id="healthDiagnosis">N/A</td>
+                            <td id="healthStatus">N/A</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+=======
+
+>>>>>>> 0aaf4c14398460848c96f765b8d8ee567497db35
+        <!-- Back to Admin Dashboard button -->
+        <a href="/api/v1/user/doctor/dashboard" class="btn btn-secondary mt-3">Back to Doctor Dashboard</a>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Fetch list of doctors for the select dropdown when the page is loaded
+            $.ajax({
+                url: '/api/v1/user/doctors',  // Endpoint to get list of doctors
+                method: 'GET',
+                success: function (doctors) {
+                    if (doctors.length === 0) {
+                        $('#doctorId').append('<option value="">No doctors available</option>');
+                    } else {
+                        doctors.forEach(function (doctor) {
+                            // Create a new option element for each doctor
+                            const option = `<option value="${doctor._id}">${doctor.firstName} ${doctor.lastName}</option>`;
+                            $('#doctorId').append(option);
+                        });
+                    }
+                },
+                error: function (xhr) {
+                    console.error('Error fetching doctors:', xhr.responseText);
+                    $('#doctorId').append('<option value="">Error loading doctors</option>');
+                }
+            });
+
+            $('#addPatientForm').submit(function (e) {
+                e.preventDefault();
+
+                // Get the form data including the new health data fields
+                const formData = {
+                    username: $('#username').val(),
+                    email: $('#email').val(),
+                    password: $('#password').val(),
+                    firstName: $('#firstName').val(),
+                    lastName: $('#lastName').val(),
+                    role: $('#role').val(),
+                    doctorId: $('#doctorId').val(),
+                    deviceID: $('#deviceID').val(), // Device ID field
+                    heartBeat: $('#heartBeat').val() || 0, // Default to 0 if not provided
+                    spo2: $('#spo2').val() || 0, // Default to 0 if not provided
+                    bodyTemp: $('#bodyTemp').val() || 0, // Default to 0 if not provided
+                    ambientTemp: $('#ambientTemp').val() || 0, // Default to 0 if not provided
+                    healthDiagnosis: $('#healthDiagnosis').val() || "Normal", // Default to "Normal" if not provided
+                    healthStatus: $('#healthStatus').val() || "Healthy" // Default to "Healthy" if not provided
+                };
+
+                // Get the doctorId from the form, which will be passed as userId in the URL
+                const doctorId = $('#doctorId').val(); // This will be used as userId in the API call
+
+                // Send the data to the backend API (create health data for a specific doctorId)
+                $.ajax({
+                    url: `/api/v1/health/create/${doctorId}`,  // URL with dynamic doctorId (as userId)
+                    method: 'POST',
+                    data: JSON.stringify(formData),
+                    contentType: 'application/json',
+                    success: function (response) {
+                        alert('Patient created and health data added successfully!');
+                        window.location.href = '/api/v1/user/doctor/dashboard';  // Redirect to the doctor dashboard
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error: ' + xhr.responseText);  // Show error message
+                    }
+                });
+            });
+        });
+    </script>
+<<<<<<< HEAD
+
+    <script>
+        $(document).ready(function () {
+            // Set up WebSocket connection to server
+            const socket = new WebSocket('ws://192.168.2.175:8080');  // Replace with your server's WebSocket URL
+
+            // Listen for messages from the WebSocket server
+            socket.onmessage = function (event) {
+                const data = JSON.parse(event.data);
+
+                // Check if the data includes health information
+                if (data.patientId === $('#username').val()) {  // Compare the patient's ID or username
+                    // Update the form fields with the received data
+                    $('#heartBeat').val(data.heartBeat);
+                    $('#spo2').val(data.spo2);
+                    $('#bodyTemp').val(data.bodyTemp);
+                    $('#ambientTemp').val(data.ambientTemp);
+                    $('#healthDiagnosis').val(data.healthDiagnosis);
+                    $('#healthStatus').val(data.healthStatus);
+
+                    // Optionally, update other UI elements like showing a live health status
+                    console.log('Updated health data:', data);
+                }
+            };
+
+            socket.onerror = function (error) {
+                console.error('WebSocket Error:', error);
+            };
+
+            // Fetch list of doctors for the select dropdown when the page is loaded
+            $.ajax({
+                url: '/api/v1/user/doctors',  // Endpoint to get list of doctors
+                method: 'GET',
+                success: function (doctors) {
+                    if (doctors.length === 0) {
+                        $('#doctorId').append('<option value="">No doctors available</option>');
+                    } else {
+                        doctors.forEach(function (doctor) {
+                            // Create a new option element for each doctor
+                            const option = `<option value="${doctor._id}">${doctor.firstName} ${doctor.lastName}</option>`;
+                            $('#doctorId').append(option);
+                        });
+                    }
+                },
+                error: function (xhr) {
+                    console.error('Error fetching doctors:', xhr.responseText);
+                    $('#doctorId').append('<option value="">Error loading doctors</option>');
+                }
+            });
+
+            $('#addPatientForm').submit(function (e) {
+                e.preventDefault();
+
+                // Get the form data including the new health data fields
+                const formData = {
+                    username: $('#username').val(),
+                    email: $('#email').val(),
+                    password: $('#password').val(),
+                    firstName: $('#firstName').val(),
+                    lastName: $('#lastName').val(),
+                    role: $('#role').val(),
+                    doctorId: $('#doctorId').val(),
+                    deviceID: $('#deviceID').val(), // Device ID field
+                    heartBeat: $('#heartBeat').val() || 0, // Default to 0 if not provided
+                    spo2: $('#spo2').val() || 0, // Default to 0 if not provided
+                    bodyTemp: $('#bodyTemp').val() || 0, // Default to 0 if not provided
+                    ambientTemp: $('#ambientTemp').val() || 0, // Default to 0 if not provided
+                    healthDiagnosis: $('#healthDiagnosis').val() || "Normal", // Default to "Normal" if not provided
+                    healthStatus: $('#healthStatus').val() || "Healthy" // Default to "Healthy" if not provided
+                };
+
+                // Get the doctorId from the form, which will be passed as userId in the URL
+                const doctorId = $('#doctorId').val(); // This will be used as userId in the API call
+
+                // Send the data to the backend API (create health data for a specific doctorId)
+                $.ajax({
+                    url: `/api/v1/health/create/${doctorId}`,  // URL with dynamic doctorId (as userId)
+                    method: 'POST',
+                    data: JSON.stringify(formData),
+                    contentType: 'application/json',
+                    success: function (response) {
+                        alert('Patient created and health data added successfully!');
+                        window.location.href = '/api/v1/user/doctor/dashboard';  // Redirect to the doctor dashboard
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error: ' + xhr.responseText);  // Show error message
+                    }
+                });
+            });
+        });
+
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            // WebSocket connection for health data
+            const ws = new WebSocket('ws://192.168.88.58:8080');
+            let heartRateData = { labels: [], datasets: [{ label: 'Heart Rate (BPM)', data: [], borderColor: 'red', fill: false }] };
+            let spO2Data = { labels: [], datasets: [{ label: 'SpO2 (%)', data: [], borderColor: 'blue', fill: false }] };
+            let bodyTempData = { labels: [], datasets: [{ label: 'Body Temp (°C)', data: [], borderColor: 'green', fill: false }] };
+            let ambientTempData = { labels: [], datasets: [{ label: 'Ambient Temp (°C)', data: [], borderColor: 'orange', fill: false }] };
+
+            const heartRateChart = new Chart($('#heartRateChart')[0], { type: 'line', data: heartRateData });
+            const spO2Chart = new Chart($('#spO2Chart')[0], { type: 'line', data: spO2Data });
+            const bodyTempChart = new Chart($('#bodyTempChart')[0], { type: 'line', data: bodyTempData });
+            const ambientTempChart = new Chart($('#ambientTempChart')[0], { type: 'line', data: ambientTempData });
+
+            ws.onmessage = function (event) {
+                const healthData = JSON.parse(event.data);
+
+                if (healthData && healthData.deviceID) {
+                    updateHealthDataInTable(healthData);
+
+                    const timestamp = moment().format('HH:mm:ss');
+                    updateCharts(healthData, timestamp);
+                } else {
+                    console.warn('Invalid health data received');
+                }
+            };
+
+           
+
+            function updateHealthDataInTable(data) {
+                $('#deviceID').text(data.deviceID || 'N/A');
+                $('#heartBeat').text(data.heartBeat || '0 BPM');
+                $('#spo2').text(data.spo2 || '0%');
+                $('#bodyTemp').text(data.bodyTemp || 'N/A');
+                $('#ambientTemp').text(data.ambientTemp || 'N/A');
+
+                if (Array.isArray(data.healthDiagnosis) && data.healthDiagnosis.length > 0) {
+                    $('#healthDiagnosis').text(data.healthDiagnosis.join(', '));
+                } else {
+                    $('#healthDiagnosis').text('N/A');
+                }
+
+                $('#healthStatus').text(data.healthStatus || 'N/A');
+            }
+
+        });
+
+    </script>
+=======
+>>>>>>> 0aaf4c14398460848c96f765b8d8ee567497db35
+</body>
+
+</html>

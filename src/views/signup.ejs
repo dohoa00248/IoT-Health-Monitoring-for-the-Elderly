@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New User</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <script src="/js/jquery-3.7.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .form-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .alert {
+            display: none;
+        }
+
+        .header-title {
+            color: #007bff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="header-title text-center mb-4">Create New User</h2>
+
+                <!-- Success/Failure message -->
+                <div id="message" class="alert"></div>
+
+                <form action="/api/v1/user/signup" method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                        <div class="form-text">Username must be unique.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password">
+                        <div class="form-text">Leave empty if you don't want to change the password.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                        <div class="form-text">We'll never share your email with anyone else.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Role</label>
+                        <select id="role" name="role" class="form-select" required>
+                            <option value="1">Admin</option>
+                            <option value="2">Doctor</option>
+                            <option value="3">Regular User</option>
+
+                        </select>
+                        <div class="form-text">Select the role for this user.</div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary">Create User</button>
+                        <a href="/api/v1/user/admin/dashboard" class="btn btn-secondary">Back to User List</a>
+                        <!-- <button id="backButton" class="btn btn-secondary">Quay lại trang</button> -->
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Xử lý khi submit form tạo người dùng
+            $('form').on('submit', function (event) {
+                event.preventDefault();  // Ngăn chặn gửi form mặc định
+
+                const username = $('#username').val();
+                const email = $('#email').val();
+                const password = $('#password').val();
+                const role = $('#role').val();
+                const messageDiv = $('#message');
+
+                // Gửi yêu cầu tạo người dùng tới API
+                $.ajax({
+                    url: '/api/v1/user/signup',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ username, email, password, role }),
+                    success: function (res) {
+                        messageDiv.removeClass('alert-danger').addClass('alert-success');
+                        // messageDiv.text('User created successfully!');
+                        messageDiv.text(res.message)
+                        messageDiv.show();
+
+                        // Chuyển hướng về trang admin sau khi tạo người dùng thành công
+                        setTimeout(function () {
+                            window.location.href = '/api/v1/user/admin/dashboard';  // Điều hướng về trang Admin
+                        }, 1500);  // Chờ 1.5s để người dùng thấy thông báo thành công
+                    },
+                    error: function (xhr) {
+                        messageDiv.removeClass('alert-success').addClass('alert-danger');
+                        messageDiv.text(`Error: ${xhr.responseText}`);
+                        messageDiv.show();
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            const token = localStorage.getItem('token');
+
+            if (token) {
+                $.ajax({
+                    url: '/api/v1/user/admin/dashboard',
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    success: function (res) {
+                        console.log('User data:', res);
+                    },
+                    error: function (xhr) {
+                        console.error('Error:', xhr.responseText);
+                    }
+                });
+            } else {
+                console.log('Token not found, please log in');
+                window.location.href = '/api/v1/auth';
+            }
+        });
+    </script>
+
+
+    <script>
+        // Quay lại trang trước
+        $('#backButton').click(function () {
+            window.history.back();
+        });
+    </script>
+</body>
+
+</html>

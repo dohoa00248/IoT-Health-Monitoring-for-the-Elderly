@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete User</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <script src="/js/jquery-3.7.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+
+        .container {
+            max-width: 600px;
+            margin-top: 100px;
+        }
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: #dc3545;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .alert {
+            font-size: 1.1rem;
+            color: #333;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .text-center {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                Delete User Confirmation
+            </div>
+            <div class="card-body">
+                <!-- Thông báo lỗi nếu có lỗi -->
+                <div id="deleteMessage" class="alert alert-danger d-none">
+                    <strong>Error!</strong> Something went wrong while trying to delete the user.
+                </div>
+
+                <!-- Thông báo thành công khi xóa thành công -->
+                <div id="deleteSuccessMessage" class="alert alert-success d-none">
+                    <strong>Success!</strong> User <strong>
+                        <%= user.username %>
+                    </strong> has been deleted successfully.
+                </div>
+
+                <!-- Displaying the user data -->
+                <div class="alert alert-danger">
+                    <strong>Warning!</strong> Are you sure you want to delete the user <strong>
+                        <%= user.username %>
+                    </strong>?
+                </div>
+
+                <!-- Deleting form -->
+                <form id="deleteForm" action="/api/v1/user/delete/<%= user._id %>?_method=DELETE" method="post">
+                    <div class="action-buttons">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                        <a href="/api/v1/user/admin/dashboard" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Optional Back to Admin link -->
+        <div class="text-center">
+            <a href="/api/v1/user/admin/dashboard" class="btn btn-link">Back to Admin Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Handle the form submission and show error if any
+            $('#deleteForm').submit(function (event) {
+                event.preventDefault();  // Prevent the default form submission
+
+                $.ajax({
+                    url: $(this).attr('action'),  // Use form's action attribute as URL
+                    type: 'POST',
+                    data: $(this).serialize(),  // Serialize form data
+                    success: function (res) {
+                        // On success, show the success message and redirect after a while
+                        $('#deleteSuccessMessage').removeClass('d-none');
+                        setTimeout(function () {
+                            window.location.href = '/api/v1/user/admin/dashboard';  // Redirect after 3 seconds
+                        }, 3000);
+                    },
+                    error: function (xhr) {
+                        // On error, show the error message
+                        $('#deleteMessage').removeClass('d-none').text('Error deleting the user.');
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            const token = localStorage.getItem('token');
+
+            if (token) {
+                $.ajax({
+                    url: '/api/v1/user/admin/dashboard',
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    success: function (res) {
+                        console.log('User data:', res);
+                    },
+                    error: function (xhr) {
+                        console.error('Error:', xhr.responseText);
+                    }
+                });
+            } else {
+                console.log('Token not found, please log in');
+                window.location.href = '/api/v1/auth';
+            }
+        });
+    </script>
+</body>
+
+</html>

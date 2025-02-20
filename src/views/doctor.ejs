@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Data Monitoring</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/home.css" />
+    <script src="/js/jquery-3.7.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+
+    <style>
+        #heartRateChart,
+        #spO2Chart,
+        #bodyTempChart,
+        #ambientTempChart {
+            width: 100%;
+            height: 300px;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .col-md-6 {
+            flex: 1 1 48%;
+        }
+
+        @media (max-width: 768px) {
+            .col-md-6 {
+                flex: 1 1 100%;
+            }
+        }
+
+        .modal-lg {
+            max-width: 90%;
+        }
+
+        #historyTable th,
+        #historyTable td {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+    <div class="container py-5">
+        <!-- Doctor Info Section -->
+        <div class="doctor-info">
+            <div class="d-flex align-items-center">
+                <img id="doctorImage" src="/img/doctor.png" alt="Ảnh Bác Sĩ" class="mr-3">
+                <div>
+                    <h4 id="doctorName">Bác sĩ: A </h4>
+                    <p id="doctorSpecialty">Chuyên Khoa: Tim Mạch</p>
+                    <p id="doctorEmail">Email: doctor@example.com</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-lg mb-4">
+            <div class="card-header bg-success text-white">
+                <h3 class="mb-0">Danh Sách Bệnh Nhân</h3>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <!-- Nút Thêm Hồ Sơ Bệnh Nhân -->
+                    <button id="addPatientBtn" class="btn btn-success">Tạo Hồ Sơ Bệnh Nhân</button>
+                </div>
+                <!-- Thêm ô tìm kiếm bệnh nhân -->
+                <div class="d-flex mb-4">
+                    <input type="text" id="searchPatient" class="form-control"
+                        placeholder="Nhập tên bệnh nhân (First/Last Name)">
+                    <button id="searchBtn" class="btn btn-primary ml-2">Tìm Bệnh Nhân</button>
+                </div>
+                <table class="table table-bordered table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>ID Bệnh Nhân</th>
+                            <th>Tên Bệnh Nhân</th>
+                            <th>Email</th>
+                            <th>Action</th> <!-- Cột mới cho nút Xem Hồ Sơ -->
+                        </tr>
+                    </thead>
+                    <tbody id="patientListContainer">
+                        <!-- Danh sách bệnh nhân sẽ được chèn vào đây -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card shadow-lg mb-4">
+
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Real-Time Health Data</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Device ID</th>
+                            <!-- <th>Patient ID</th> -->
+                            <th>Heart Beat</th>
+                            <th>SpO2</th>
+                            <th>Body Temperature</th>
+                            <th>Ambient Temperature</th>
+                            <th>Health Diagnosis</th>
+                            <th>Health Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="deviceID">N/A</td>
+                            <!-- <td id="patientID">N/A</td> -->
+                            <td id="heartBeat">0 BPM</td>
+                            <td id="spo2">0%</td>
+                            <td id="bodyTemp">N/A</td>
+                            <td id="ambientTemp">N/A</td>
+                            <td id="healthDiagnosis">N/A</td>
+                            <td id="healthStatus">N/A</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card shadow-lg">
+            <div class="card-header bg-info text-white">
+                <h3 class="mb-0">Health Charts</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <canvas id="heartRateChart"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <canvas id="spO2Chart"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <canvas id="bodyTempChart"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <canvas id="ambientTempChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button id="viewHistoryBtn" class="btn btn-primary">Xem Lịch sử</button>
+        <button id="backButton" class="btn btn-secondary">Quay lại trang</button>
+        <button id="logoutBtn" class="btn btn-danger">Đăng Xuất</button> <!-- Đăng xuất -->
+
+        <!-- Modal History -->
+        <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="historyModalLabel">Lịch Sử Dữ Liệu Sức Khỏe</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-bordered table-striped table-hover" id="historyTable">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Device ID</th>
+                                    <!-- <th>Patient ID</th> -->
+                                    <th>Heart Beat</th>
+                                    <th>SpO2</th>
+                                    <th>Body Temperature</th>
+                                    <th>Ambient Temperature</th>
+                                    <th>Health Diagnosis</th>
+                                    <th>Health Status</th>
+                                    <th>Created At</th>
+                                    <th>Updated At</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="button" class="btn btn-success" id="exportExcelBtn">Xuất Excel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- !-- Modal để hiển thị dữ liệu sức khỏe của bệnh nhân -->
+    <div class="modal fade" id="healthDataModal" tabindex="-1" aria-labelledby="healthDataModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="healthDataModalLabel">Lịch Sử Dữ Liệu Sức Khỏe</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Device ID</th>
+                                <th>Heart Beat</th>
+                                <th>SpO2</th>
+                                <th>Body Temperature</th>
+                                <th>Ambient Temperature</th>
+                                <th>Health Diagnosis</th>
+                                <th>Health Status</th>
+                                <th>Created At</th>
+                                <th>Updated At</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+<<<<<<< HEAD
+            const ws = new WebSocket('ws://192.168.2.175:8080');
+=======
+            const ws = new WebSocket('ws://192.168.88.58:8080');
+>>>>>>> 0aaf4c14398460848c96f765b8d8ee567497db35
+
+            // const ws = new WebSocket('ws://192.168.6.58:8080');
+            let heartRateData = { labels: [], datasets: [{ label: 'Heart Rate (BPM)', data: [], borderColor: 'red', fill: false }] };
+            let spO2Data = { labels: [], datasets: [{ label: 'SpO2 (%)', data: [], borderColor: 'blue', fill: false }] };
+            let bodyTempData = { labels: [], datasets: [{ label: 'Body Temp (°C)', data: [], borderColor: 'green', fill: false }] };
+            let ambientTempData = { labels: [], datasets: [{ label: 'Ambient Temp (°C)', data: [], borderColor: 'orange', fill: false }] };
+
+            const heartRateChart = new Chart($('#heartRateChart')[0], { type: 'line', data: heartRateData });
+            const spO2Chart = new Chart($('#spO2Chart')[0], { type: 'line', data: spO2Data });
+            const bodyTempChart = new Chart($('#bodyTempChart')[0], { type: 'line', data: bodyTempData });
+            const ambientTempChart = new Chart($('#ambientTempChart')[0], { type: 'line', data: ambientTempData });
+
+            ws.onmessage = function (event) {
+                const healthData = JSON.parse(event.data);
+
+                if (healthData && healthData.deviceID) {
+
+                    updateHealthDataInTable(healthData);
+
+                    const timestamp = moment().format('HH:mm:ss');
+                    // Cập nhật biểu đồ với dữ liệu mới
+                    updateCharts(healthData, timestamp);
+                } else {
+                    console.warn('Invalid health data received');
+                }
+            };
+
+            // Cập nhật biểu đồ với dữ liệu mới
+            function updateCharts(healthData, timestamp) {
+                heartRateData.labels.push(timestamp);
+                heartRateData.datasets[0].data.push(healthData.heartBeat);
+
+                spO2Data.labels.push(timestamp);
+                spO2Data.datasets[0].data.push(healthData.spo2);
+
+                bodyTempData.labels.push(timestamp);
+                bodyTempData.datasets[0].data.push(healthData.bodyTemp);
+
+                ambientTempData.labels.push(timestamp);
+                ambientTempData.datasets[0].data.push(healthData.ambientTemp);
+
+                // Giới hạn số lượng điểm dữ liệu hiển thị trên đồ thị (nếu muốn)
+                if (heartRateData.labels.length > 30) { heartRateData.labels.shift(); heartRateData.datasets[0].data.shift(); }
+                if (spO2Data.labels.length > 30) { spO2Data.labels.shift(); spO2Data.datasets[0].data.shift(); }
+                if (bodyTempData.labels.length > 30) { bodyTempData.labels.shift(); bodyTempData.datasets[0].data.shift(); }
+                if (ambientTempData.labels.length > 30) { ambientTempData.labels.shift(); ambientTempData.datasets[0].data.shift(); }
+
+                // Cập nhật biểu đồ
+                heartRateChart.update();
+                spO2Chart.update();
+                bodyTempChart.update();
+                ambientTempChart.update();
+            }
+
+            // Cập nhật dữ liệu của bảng mà không thay đổi cấu trúc bảng
+            function updateHealthDataInTable(data) {
+                $('#deviceID').text(data.deviceID || 'N/A');
+
+                $('#heartBeat').text(data.heartBeat || '0 BPM');
+                $('#spo2').text(data.spo2 || '0%');
+                $('#bodyTemp').text(data.bodyTemp || 'N/A');
+                $('#ambientTemp').text(data.ambientTemp || 'N/A');
+
+                if (Array.isArray(data.healthDiagnosis) && data.healthDiagnosis.length > 0) {
+                    $('#healthDiagnosis').text(data.healthDiagnosis.join(', '));
+                } else {
+                    $('#healthDiagnosis').text('N/A');
+                }
+
+                $('#healthStatus').text(data.healthStatus || 'N/A');
+            }
+
+            // Xử lý khi nhấn nút "Xem Lịch sử"
+            $('#viewHistoryBtn').click(function () {
+                $.ajax({
+                    url: '/api/v1/health/history',
+                    method: 'GET',
+                    success: function (data) {
+                        $('#historyTable tbody').empty();
+                        if (Array.isArray(data) && data.length > 0) {
+                            data.forEach(item => {
+                                const tableRow = `<tr>
+                                    <td>${item.deviceID || 'N/A'}</td>
+                
+                                    <td>${item.heartBeat || '0 BPM'}</td>
+                                    <td>${item.spo2 || '0%'}</td>
+                                    <td>${item.bodyTemp || 'N/A'}</td>
+                                    <td>${item.ambientTemp || 'N/A'}</td>
+                                    <td>${Array.isArray(item.healthDiagnosis) && item.healthDiagnosis.length > 0 ? item.healthDiagnosis.join(', ') : 'N/A'}</td>
+                                    <td>${item.healthStatus || 'N/A'}</td>
+                                    <td>${item.createdAt ? new Date(item.createdAt).toLocaleString() : 'N/A'}</td>
+                                    <td>${item.updatedAt ? new Date(item.updatedAt).toLocaleString() : 'N/A'}</td>
+                                </tr>`;
+                                $('#historyTable tbody').append(tableRow);
+                            });
+                        } else {
+                            $('#historyTable tbody').append('<tr><td colspan="10">No data available</td></tr>');
+                        }
+                        $('#historyModal').modal('show');
+                    },
+                    error: function () {
+                        alert('Không thể tải lịch sử dữ liệu.');
+                    }
+                });
+            });
+
+            // Xuất Excel
+            $('#exportExcelBtn').click(function () {
+                const table = $('#historyTable');
+                const wb = XLSX.utils.table_to_book(table[0], { sheet: "History Data" });
+                XLSX.writeFile(wb, "Health_Data_History.xlsx");
+            });
+
+            // Quay lại trang trước
+            $('#backButton').click(function () {
+                window.history.back();
+            });
+
+            // Xử lý khi nhấn nút "Đăng Xuất"
+            $('#logoutBtn').click(function () {
+                // Xóa token khỏi localStorage
+                localStorage.removeItem('token');
+
+                // Chuyển hướng về trang đăng nhập
+                window.location.href = '/api/v1/auth';
+            });
+        });
+    </script>
+
+    <script>
+        // Cập nhật thông tin bác sĩ từ token JWT
+        var token = localStorage.getItem('token');
+        if (token) {
+            var decodedToken = jwt_decode(token); // Giải mã token
+            console.log(decodedToken);  // Kiểm tra thông tin decoded từ token
+
+            // Lấy thông tin bác sĩ từ token
+            $('#doctorName').text(decodedToken.firstName + ' ' + decodedToken.lastName);
+            $('#doctorEmail').text('Email: ' + decodedToken.email);
+
+            // Lấy danh sách bệnh nhân từ token (ID bệnh nhân)
+            if (decodedToken.patients && Array.isArray(decodedToken.patients)) {
+                // Gọi hàm để lấy thông tin chi tiết bệnh nhân
+                fetchPatientDetails(decodedToken.patients);
+            } else {
+                console.error('No patients found in the token');
+            }
+        } else {
+            // Nếu không có token, chuyển hướng về trang đăng nhập
+            window.location.href = '/api/v1/auth';
+        }
+
+        // Hàm lấy thông tin chi tiết bệnh nhân từ mảng patients[] trong token
+        function fetchPatientDetails(patientIds) {
+            var token = localStorage.getItem('token'); // Lấy token từ localStorage
+            var patientListContainer = $('#patientListContainer');
+            patientListContainer.empty(); // Xóa danh sách bệnh nhân hiện tại
+
+            // Duyệt qua mảng ID bệnh nhân và lấy thông tin chi tiết của mỗi bệnh nhân
+            patientIds.forEach(function (patientId) {
+                $.ajax({
+                    url: `/api/v1/user/patient/${patientId}`,  // Gọi API để lấy thông tin bệnh nhân
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    success: function (patientData) {
+                        var patientRow = `<tr>
+                        <td>${patientData._id || 'N/A'}</td>
+                        <td>${patientData.firstName || 'N/A'} ${patientData.lastName || 'N/A'}</td>
+                        <td>${patientData.email || 'N/A'}</td>
+                        <td>
+                            <button id="viewHealthDataBtn" class="btn btn-info">Xem Dữ Liệu Sức Khỏe</button>
+                            <button id="updateHealthDataBtn" class="btn btn-warning" onclick="window.location.href='/api/v1/user/update-healthdata/${patientData._id}'">Cập Nhật Sức Khỏe</button>
+    
+                        </td>
+                        
+                    </tr>`;
+
+                        patientListContainer.append(patientRow);
+                    },
+                    error: function () {
+                        console.error('Không thể tải thông tin bệnh nhân');
+                    }
+                });
+            });
+
+        }
+
+        // Xử lý khi nhấn nút "Tìm Bệnh Nhân"
+        $('#searchBtn').click(function () {
+            var searchQuery = $('#searchPatient').val().trim(); // Lấy giá trị từ ô input tìm kiếm
+
+            if (searchQuery) {
+                // Gửi yêu cầu tìm kiếm bệnh nhân theo tên
+                $.ajax({
+                    url: '/api/v1/user/patients/search', // API endpoint tìm kiếm bệnh nhân
+                    method: 'GET',
+                    data: { query: searchQuery }, // Truyền từ khóa tìm kiếm
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }, // Gửi token xác thực
+                    success: function (data) {
+                        if (Array.isArray(data.patients)) {
+                            displayPatients(data.patients);  // Hiển thị danh sách bệnh nhân tìm được
+                        } else {
+                            alert('Không có bệnh nhân nào khớp với tìm kiếm!');
+                        }
+                    },
+                    error: function () {
+                        alert('Có lỗi xảy ra khi tìm kiếm bệnh nhân!');
+                    }
+                });
+            } else {
+                alert('Vui lòng nhập tên bệnh nhân để tìm kiếm.');
+            }
+        });
+
+        // Hàm hiển thị danh sách bệnh nhân khi tìm kiếm
+        function displayPatients(patients) {
+            var patientListContainer = $('#patientListContainer');
+            patientListContainer.empty(); // Xóa danh sách bệnh nhân hiện tại
+
+            if (patients.length === 0) {
+                patientListContainer.append('<tr><td colspan="4">Không có kết quả tìm kiếm.</td></tr>');
+                return;
+            }
+
+            // Duyệt qua mảng bệnh nhân và hiển thị vào bảng
+            patients.forEach(function (patient) {
+                var patientRow = `<tr>
+                <td>${patient._id || 'N/A'}</td>
+                <td>${patient.firstName || 'N/A'} ${patient.lastName || 'N/A'}</td>
+                <td>${patient.email || 'N/A'}</td>
+                <td>
+                    <button id="viewHealthDataBtn" class="btn btn-info">Xem Dữ Liệu Sức Khỏe</button>
+                   
+                   <button id="updateHealthDataBtn" class="btn btn-warning" onclick="window.location.href='/api/v1/user/update-healthdata/${patientData._id}'">Cập Nhật Sức Khỏe</button>
+                    
+                </td>
+                 
+            </tr>`;
+                patientListContainer.append(patientRow);
+            });
+
+            // Add click event to each "View Health History" button
+            $('.viewHealthHistoryBtn').click(function () {
+                var patientId = $(this).data('patient-id');
+                viewHealthHistory(patientId); // Function xử lý để xem lịch sử sức khỏe của bệnh nhân
+            });
+
+        }
+    </script>
+
+
+    <script>
+        $('#addPatientBtn').click(function () {
+            // Chuyển hướng đến trang tạo hồ sơ bệnh nhân
+            window.location.href = '/api/v1/user/addpatient-doctor';  // Thay đổi URL cho phù hợp
+        });
+
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            // Xử lý khi nhấn nút "Xem Hồ Sơ Bệnh Nhân"
+            $(document).on('click', '#viewHealthDataBtn', function () {
+                const patientId = $(this).closest('tr').find('td:first').text(); // Lấy ID bệnh nhân từ dòng của bảng
+
+                // Gửi yêu cầu GET để lấy dữ liệu sức khỏe của bệnh nhân
+                $.ajax({
+                    url: `/api/v1/health/${patientId}`,  // API route của bạn
+                    method: 'GET',
+                    success: function (data) {
+                        if (Array.isArray(data) && data.length > 0) {
+                            // Xóa dữ liệu cũ trong modal
+                            $('#healthDataModal tbody').empty();
+
+                            // Duyệt qua mảng healthData[] và thêm từng item vào modal
+                            data.forEach(item => {
+                                const row = `<tr>
+                            <td>${item.deviceID || 'N/A'}</td>
+                            <td>${item.heartBeat || 'N/A'}</td>
+                            <td>${item.spo2 || 'N/A'}</td>
+                            <td>${item.bodyTemp || 'N/A'}</td>
+                            <td>${item.ambientTemp || 'N/A'}</td>
+                            <td>${item.healthDiagnosis || 'N/A'}</td>
+                            <td>${item.healthStatus || 'N/A'}</td>
+                            <td>${new Date(item.createdAt).toLocaleString()}</td>
+                            <td>${new Date(item.updatedAt).toLocaleString()}</td>
+                        </tr>`;
+                                $('#healthDataModal tbody').append(row);
+                            });
+
+                            // Mở modal để hiển thị lịch sử sức khỏe
+                            $('#healthDataModal').modal('show');
+                        } else {
+                            alert('Không có dữ liệu sức khỏe cho bệnh nhân này');
+                        }
+                    },
+                    error: function () {
+                        alert('Có lỗi xảy ra khi tải thông tin sức khỏe của bệnh nhân');
+                    }
+                });
+            });
+        });
+
+    </script>
+
+</body>
+
+</html>

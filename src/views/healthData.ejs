@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Data Monitoring</title>
+
+    <!-- Liên kết Bootstrap CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/home.css" />
+
+    <!-- Các thư viện JavaScript cần thiết -->
+    <script src="/js/jquery-3.7.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        /* Các kiểu CSS giữ nguyên như trước */
+        /* Tăng kích thước các biểu đồ */
+        #heartRateChart,
+        #spO2Chart,
+        #bodyTempChart,
+        #ambientTempChart {
+            width: 100%;
+            height: 300px;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .col-md-6 {
+            flex: 1 1 48%;
+        }
+
+        @media (max-width: 768px) {
+            .col-md-6 {
+                flex: 1 1 100%;
+            }
+        }
+
+        .modal-lg {
+            max-width: 90%;
+        }
+
+        #historyTable th,
+        #historyTable td {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+    <div class="container py-5">
+        <!-- Card hiển thị dữ liệu sức khỏe -->
+        <div class="card shadow-lg mb-4">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Real-Time Health Data</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Device ID</th>
+                            <th>Patient ID</th>
+                            <th>Heart Beat</th>
+                            <th>SpO2</th>
+                            <th>Body Temperature</th>
+                            <th>Ambient Temperature</th>
+                            <th>Health Diagnosis</th>
+                            <th>Health Status</th>
+                            <th>Created At</th>
+                            <th>Updated At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dữ liệu này sẽ được thay thế bởi EJS -->
+                        <tr>
+                            <td id="deviceID">
+                                <%= healthData.deviceID || 'N/A' %>
+                            </td>
+                            <td id="patientID">
+                                <%= healthData.patientID || 'N/A' %>
+                            </td>
+                            <td id="heartBeat">
+                                <%= healthData.heartBeat || '0 BPM' %>
+                            </td>
+                            <td id="spo2">
+                                <%= healthData.spo2 || '0%' %>
+                            </td>
+                            <td id="tempBody">
+                                <%= healthData.tempBody || 'N/A' %>
+                            </td>
+                            <td id="ambientTemp">
+                                <%= healthData.ambientTemp || 'N/A' %>
+                            </td>
+                            <td id="healthDiagnosis">
+                                <%= healthData.healthDiagnosis ? healthData.healthDiagnosis.join(', ') : ' N/A' %>
+                            </td>
+                            <td id="healthStatus">
+                                <%= healthData.healthStatus || 'N/A' %>
+                            </td>
+                            <td id="createdAt">
+                                <%= healthData.createdAt ? new Date(healthData.createdAt).toLocaleString() : 'N/A' %>
+                            </td>
+                            <td id="updatedAt">
+                                <%= healthData.updatedAt ? new Date(healthData.updatedAt).toLocaleString() : 'N/A' %>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Biểu đồ sức khỏe -->
+        <div class="card shadow-lg">
+            <div class="card-header bg-info text-white">
+                <h3 class="mb-0">Health Charts</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <canvas id="heartRateChart"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <canvas id="spO2Chart"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <canvas id="bodyTempChart"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <canvas id="ambientTempChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nút xem lịch sử -->
+        <button id="viewHistoryBtn" class="btn btn-primary">Xem Lịch sử</button>
+
+        <!-- Modal Xem Lịch Sử -->
+        <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="historyModalLabel">Lịch Sử Dữ Liệu Sức Khỏe</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-bordered table-striped table-hover" id="historyTable">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Device ID</th>
+                                    <th>Patient ID</th>
+                                    <th>Heart Beat</th>
+                                    <th>SpO2</th>
+                                    <th>Body Temperature</th>
+                                    <th>Ambient Temperature</th>
+                                    <th>Health Diagnosis</th>
+                                    <th>Health Status</th>
+                                    <th>Created At</th>
+                                    <th>Updated At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dữ liệu lịch sử sẽ được chèn vào từ JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng1</button>
+                        <!-- Nút Xuất Excel -->
+                        <button type="button" class="btn btn-success" id="exportExcelBtn">Xuất Excel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script xử lý WebSocket và AJAX -->
+    <script>
+        $(document).ready(function () {
+            // WebSocket kết nối đến server
+            const ws = new WebSocket('ws://192.168.94.58:8080'); // Đảm bảo sử dụng đúng URL của server
+
+            // Biến lưu trữ dữ liệu biểu đồ
+            let heartRateData = { labels: [], datasets: [{ label: 'Heart Rate (BPM)', data: [], borderColor: 'red', fill: false }] };
+            let spO2Data = { labels: [], datasets: [{ label: 'SpO2 (%)', data: [], borderColor: 'blue', fill: false }] };
+            let bodyTempData = { labels: [], datasets: [{ label: 'Body Temp (°C)', data: [], borderColor: 'green', fill: false }] };
+            let ambientTempData = { labels: [], datasets: [{ label: 'Ambient Temp (°C)', data: [], borderColor: 'orange', fill: false }] };
+
+            // Tạo các biểu đồ
+            const heartRateChart = new Chart($('#heartRateChart')[0], { type: 'line', data: heartRateData });
+            const spO2Chart = new Chart($('#spO2Chart')[0], { type: 'line', data: spO2Data });
+            const bodyTempChart = new Chart($('#bodyTempChart')[0], { type: 'line', data: bodyTempData });
+            const ambientTempChart = new Chart($('#ambientTempChart')[0], { type: 'line', data: ambientTempData });
+
+            // Lắng nghe dữ liệu từ WebSocket
+            ws.onmessage = function (event) {
+                const healthData = JSON.parse(event.data);
+
+                // Cập nhật bảng với dữ liệu mới
+                updateHealthData(healthData);
+
+                // Cập nhật dữ liệu biểu đồ
+                const timestamp = moment().format('HH:mm:ss'); // Lấy thời gian hiện tại
+                heartRateData.labels.push(timestamp);
+                heartRateData.datasets[0].data.push(healthData.heartBeat);
+
+                spO2Data.labels.push(timestamp);
+                spO2Data.datasets[0].data.push(healthData.spo2);
+
+                bodyTempData.labels.push(timestamp);
+                bodyTempData.datasets[0].data.push(healthData.tempBody);
+
+                ambientTempData.labels.push(timestamp);
+                ambientTempData.datasets[0].data.push(healthData.ambientTemp);
+
+                // Giới hạn số lượng điểm dữ liệu trên biểu đồ (60 điểm)
+                if (heartRateData.labels.length > 60) {
+                    heartRateData.labels.shift();
+                    heartRateData.datasets[0].data.shift();
+                }
+                if (spO2Data.labels.length > 60) {
+                    spO2Data.labels.shift();
+                    spO2Data.datasets[0].data.shift();
+                }
+                if (bodyTempData.labels.length > 60) {
+                    bodyTempData.labels.shift();
+                    bodyTempData.datasets[0].data.shift();
+                }
+                if (ambientTempData.labels.length > 60) {
+                    ambientTempData.labels.shift();
+                    ambientTempData.datasets[0].data.shift();
+                }
+
+                // Cập nhật lại biểu đồ
+                heartRateChart.update();
+                spO2Chart.update();
+                bodyTempChart.update();
+                ambientTempChart.update();
+            };
+
+            // Hàm cập nhật bảng với dữ liệu mới
+            function updateHealthData(data) {
+                $('#deviceID').text(data.deviceID || 'N/A');
+                $('#patientID').text(data.patientID || 'N/A');
+                $('#heartBeat').text(data.heartBeat || '0 BPM');
+                $('#spo2').text(data.spo2 || '0 %');
+                $('#tempBody').text(data.tempBody || 'N/A');
+                $('#ambientTemp').text(data.ambientTemp || 'N/A');
+                $('#healthDiagnosis').text(data.healthDiagnosis ? data.healthDiagnosis.join(', ') : 'N/A');
+                $('#healthStatus').text(data.healthStatus || 'N/A');
+                $('#createdAt').text(data.createdAt ? new Date(data.createdAt).toLocaleString() : 'N/A');
+                $('#updatedAt').text(data.updatedAt ? new Date(data.updatedAt).toLocaleString() : 'N/A');
+            }
+
+            // Sự kiện click nút "Xem Lịch sử"
+            $('#viewHistoryBtn').click(function () {
+                $.ajax({
+                    url: '/api/v1/test/history',
+                    method: 'GET',
+                    success: function (data) {
+                        $('#historyTable tbody').empty();
+
+                        data.forEach(item => {
+                            const tableRow = `<tr>
+                                <td>${item.deviceID || 'N/A'}</td>
+                                <td>${item.patientID || 'N/A'}</td>
+                                <td>${item.heartBeat || '0 BPM'}</td>
+                                <td>${item.spo2 || '0%'}</td>
+                                <td>${item.tempBody || 'N/A'}</td>
+                                <td>${item.ambientTemp || 'N/A'}</td>
+                                <td>${item.healthDiagnosis ? item.healthDiagnosis.join(', ') : 'N/A'}</td>
+                                <td>${item.healthStatus || 'N/A'}</td>
+                                <td>${item.createdAt ? new Date(item.createdAt).toLocaleString() : 'N/A'}</td>
+                                <td>${item.updatedAt ? new Date(item.updatedAt).toLocaleString() : 'N/A'}</td>
+                            </tr>`;
+                            $('#historyTable tbody').append(tableRow);
+                        });
+
+                        // Hiển thị modal
+                        $('#historyModal').modal('show');
+                    },
+                    error: function () {
+                        alert('Không thể tải lịch sử dữ liệu.');
+                    }
+                });
+            });
+
+            // Sự kiện xuất Excel
+            $('#exportExcelBtn').click(function () {
+                const table = $('#historyTable');
+                const wb = XLSX.utils.table_to_book(table[0], { sheet: "History Data" });
+                XLSX.writeFile(wb, "Health_Data_History.xlsx");
+            });
+        });
+    </script>
+</body>
+
+</html>

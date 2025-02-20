@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cập Nhật Dữ Liệu Sức Khỏe</title>
+</head>
+
+<body>
+    <h1>Cập Nhật Dữ Liệu Sức Khỏe</h1>
+
+    <!-- Form to update health data -->
+    <form action="/api/v1/user/update-healthdata/<%= healthData.deviceID %>" method="POST">
+        <label for="heartBeat">Nhịp tim:</label>
+        <input type="number" id="heartBeat" name="heartBeat" value="<%= healthData.heartBeat %>" required><br>
+
+        <label for="spo2">SpO2:</label>
+        <input type="number" id="spo2" name="spo2" value="<%= healthData.spo2 %>" required><br>
+
+        <label for="bodyTemp">Nhiệt độ cơ thể:</label>
+        <input type="number" id="bodyTemp" name="bodyTemp" value="<%= healthData.bodyTemp %>" required><br>
+
+        <label for="ambientTemp">Nhiệt độ môi trường:</label>
+        <input type="number" id="ambientTemp" name="ambientTemp" value="<%= healthData.ambientTemp %>" required><br>
+
+        <button type="submit">Cập Nhật</button>
+    </form>
+</body>
+
+</html>
