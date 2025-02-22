@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="/css/home.css" />
     <script src="/js/jquery-3.7.1.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
+    <!-- <script src="/js/doctor.js"></script> -->
+    <script src="/js/websocket.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -134,7 +136,6 @@
                 </table>
             </div>
         </div>
-
         <div class="card shadow-lg">
             <div class="card-header bg-info text-white">
                 <h3 class="mb-0">Health Charts</h3>
@@ -197,7 +198,6 @@
         </div>
     </div>
 
-
     <!-- !-- Modal để hiển thị dữ liệu sức khỏe của bệnh nhân -->
     <div class="modal fade" id="healthDataModal" tabindex="-1" aria-labelledby="healthDataModalLabel"
         aria-hidden="true">
@@ -232,13 +232,10 @@
         </div>
     </div>
 
-    <script>
+    <!-- <script>
         $(document).ready(function () {
-<<<<<<< HEAD
+
             const ws = new WebSocket('ws://192.168.2.175:8080');
-=======
-            const ws = new WebSocket('ws://192.168.88.58:8080');
->>>>>>> 0aaf4c14398460848c96f765b8d8ee567497db35
 
             // const ws = new WebSocket('ws://192.168.6.58:8080');
             let heartRateData = { labels: [], datasets: [{ label: 'Heart Rate (BPM)', data: [], borderColor: 'red', fill: false }] };
@@ -322,7 +319,6 @@
                             data.forEach(item => {
                                 const tableRow = `<tr>
                                     <td>${item.deviceID || 'N/A'}</td>
-                
                                     <td>${item.heartBeat || '0 BPM'}</td>
                                     <td>${item.spo2 || '0%'}</td>
                                     <td>${item.bodyTemp || 'N/A'}</td>
@@ -346,11 +342,11 @@
             });
 
             // Xuất Excel
-            $('#exportExcelBtn').click(function () {
-                const table = $('#historyTable');
-                const wb = XLSX.utils.table_to_book(table[0], { sheet: "History Data" });
-                XLSX.writeFile(wb, "Health_Data_History.xlsx");
-            });
+            // $('#exportExcelBtn').click(function () {
+            //     const table = $('#historyTable');
+            //     const wb = XLSX.utils.table_to_book(table[0], { sheet: "History Data" });
+            //     XLSX.writeFile(wb, "Health_Data_History.xlsx");
+            // });
 
             // Quay lại trang trước
             $('#backButton').click(function () {
@@ -366,7 +362,7 @@
                 window.location.href = '/api/v1/auth';
             });
         });
-    </script>
+    </script> -->
 
     <script>
         // Cập nhật thông tin bác sĩ từ token JWT
@@ -411,7 +407,7 @@
                         <td>
                             <button id="viewHealthDataBtn" class="btn btn-info">Xem Dữ Liệu Sức Khỏe</button>
                             <button id="updateHealthDataBtn" class="btn btn-warning" onclick="window.location.href='/api/v1/user/update-healthdata/${patientData._id}'">Cập Nhật Sức Khỏe</button>
-    
+
                         </td>
                         
                     </tr>`;
@@ -491,11 +487,11 @@
 
 
     <script>
+        //link chuyen huong
         $('#addPatientBtn').click(function () {
             // Chuyển hướng đến trang tạo hồ sơ bệnh nhân
             window.location.href = '/api/v1/user/addpatient-doctor';  // Thay đổi URL cho phù hợp
         });
-
     </script>
 
     <script>

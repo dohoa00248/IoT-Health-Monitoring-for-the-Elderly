@@ -31,12 +31,8 @@ int ledLowSpo2 = 25;
 int ledHighTemp = 26;
 
 // Thông tin WebSocket server
-<<<<<<< HEAD
-const char* websocketServer = "192.168.88.58";  // Địa chỉ WebSocket server
-=======
-const char* websocketServer = "192.168.2.175";  // Địa chỉ WebSocket server
->>>>>>> 0aaf4c14398460848c96f765b8d8ee567497db35
 
+const char* websocketServer = "192.168.1.26";  // Địa chỉ WebSocket server
 
 const int port = 8080;
 WebSocketsClient webSocket;
