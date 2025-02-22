@@ -68,3 +68,7 @@ Interacting with the API: If the project includes an API, you can use tools like
 Access the Admin Dashboard: For administrative functions, navigate to http://localhost:8080/api/v1/user/admin. This endpoint provides access to the admin dashboard where you can explore various administrative features.
 
 ## Configuration
+
+test admin: username: admim , password: admin
+test doctor: username: doctor, password: doctor
+test user: username: patient, password: patient
