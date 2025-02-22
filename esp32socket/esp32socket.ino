@@ -8,11 +8,9 @@
 #include <WebSocketsClient.h>
 
 // Cấu hình Wi-Fi
-<<<<<<< HEAD
-#define WIFI_SSID "Wifi chùa"
-=======
+
 #define WIFI_SSID "DTH 999"
->>>>>>> 0aaf4c14398460848c96f765b8d8ee567497db35
+
 #define WIFI_PASSWORD "9999999990"
 
 // Địa chỉ I2C và các cảm biến
