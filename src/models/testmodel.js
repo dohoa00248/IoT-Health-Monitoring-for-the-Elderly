@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import User from './user.model.js'; // Điều chỉnh đường dẫn cho phù hợp
+import User from './user.model.js'; 
 
 async function main() {
     try {
@@ -8,16 +8,13 @@ async function main() {
         });
         console.log('Connected to MongoDB!');
 
-        // Gọi hàm findById và chờ kết quả
         const user = await User.createUser('test', 'test', 'test@gmail.com');
-        console.log('User:', user); // In thông tin người dùng ra console
+        console.log('User:', user); 
     } catch (error) {
         console.error('Error:', error);
     } finally {
-        mongoose.connection.close(); // Đóng kết nối khi xong
+        mongoose.connection.close(); 
     }
 }
-
-// Thực thi hàm chính
 main();
 

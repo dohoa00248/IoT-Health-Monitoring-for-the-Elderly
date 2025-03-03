@@ -1,7 +1,7 @@
 {
-  "name": "eldercare-realtime-health-monitor",
+  "name": "iot-health-monitoring-for-the-elderly",
   "version": "1.0.0",
-  "description": "ElderCare RealTime Health Monitor",
+  "description": "IoT Health Monitoring For The Elderly",
   "main": "server.js",
   "type": "module",
   "scripts": {

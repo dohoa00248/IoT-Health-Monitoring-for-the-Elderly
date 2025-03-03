@@ -7,7 +7,6 @@ const highHeartRate = 80;
 const lowSpo2 = 95;
 const highTemp = 37.5;
 
-// Hàm chẩn đoán sức khỏe
 const diagnoseHealth = (heart_beat, spo2, temp_obj) => {
     let diagnosisArray = [];
 
@@ -29,7 +28,7 @@ const diagnoseHealth = (heart_beat, spo2, temp_obj) => {
     return diagnosisArray;
 };
 
-// Hàm chẩn đoán trạng thái sức khỏe
+
 const diagnoseHealthStatus = (heart_beat, spo2, temp_obj) => {
     if (heart_beat < lowHeartRate || heart_beat > highHeartRate ||
         spo2 < lowSpo2 || temp_obj > highTemp) {
@@ -38,7 +37,7 @@ const diagnoseHealthStatus = (heart_beat, spo2, temp_obj) => {
     return "Khỏe mạnh";
 };
 
-// Lưu dữ liệu sức khỏe vào cơ sở dữ liệu
+
 const saveHealthData = async (data, healthDiagnosis, healthStatus) => {
     const newHealthData = new HealthData({
         deviceID: data.deviceID,
@@ -50,16 +49,14 @@ const saveHealthData = async (data, healthDiagnosis, healthStatus) => {
         healthStatus: healthStatus
     });
 
-    // Lưu vào cơ sở dữ liệu
     await newHealthData.save();
     return newHealthData;
 };
 
-// Cập nhật thông tin sức khỏe của bệnh nhân
 const updatePatientHealthData = async (patientId, healthDataId) => {
     const patient = await User.findById(patientId);
     if (patient) {
-        patient.healthData.push(healthDataId); // Thêm bản ghi sức khỏe vào mảng healthData
+        patient.healthData.push(healthDataId);
         await patient.save();
         return true;
     } else {

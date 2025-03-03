@@ -1,4 +1,5 @@
 $(document).ready(function () {
+
     const ws = new WebSocket('ws://192.168.26:8080');
 
     let heartRateData = { labels: [], datasets: [{ label: 'Heart Rate (BPM)', data: [], borderColor: 'red', fill: false }] };

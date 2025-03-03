@@ -5,7 +5,7 @@ import User from '../models/User.js';
 configDotenv();
 
 function authenticateToken(req, res, next) {
-    // Lấy token từ header Authorization
+  
     const token = req.headers['authorization']?.split(' ')[1];
 
     if (!token) {
@@ -13,7 +13,6 @@ function authenticateToken(req, res, next) {
         // return res.status(401).json({ message: 'Authorization header is required. Token missing.' });
     }
 
-    // Xác thực và giải mã token
     jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, decoded) => {
         if (err) {
             return res.status(401).json({ message: 'Invalid token', error: err.message });

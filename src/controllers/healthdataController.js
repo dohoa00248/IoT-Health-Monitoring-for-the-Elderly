@@ -1,9 +1,8 @@
 
-import bcrypt from 'bcrypt'; // Đảm bảo bcrypt được import
+import bcrypt from 'bcrypt'; 
 import HealthData from "../models/HealthData.js";
 import User from "../models/User.js";
 
-// Tạo dữ liệu sức khỏe cho người dùng
 const createHealthDataForUser = async (req, res) => {
     const { username, email, password, firstName, lastName, role, doctorId, deviceID, heartBeat, spo2, bodyTemp, ambientTemp, healthDiagnosis, healthStatus } = req.body;
 
@@ -13,7 +12,9 @@ const createHealthDataForUser = async (req, res) => {
 
     try {
         console.log('Request body:', req.body);
+
         const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+
         if (existingUser) {
             console.log('User already exists');
             return res.status(400).json({ message: 'Username or Email already exists' });
@@ -24,18 +25,17 @@ const createHealthDataForUser = async (req, res) => {
             console.log('Doctor not found or invalid doctor ID');
             return res.status(400).json({ message: 'Doctor not found or invalid doctor ID' });
         }
-        // Tạo bản ghi healthData cho bệnh nhân
+
         const newHealthData = new HealthData({
             deviceID,
-            heartBeat: heartBeat || 0,  // Nhịp tim mặc định
-            spo2: spo2 || 0,            // SpO2 mặc định
-            bodyTemp: bodyTemp || 0,    // Nhiệt độ mặc định
-            ambientTemp: ambientTemp || 0, // Nhiệt độ môi trường mặc định
-            healthDiagnosis: healthDiagnosis || [], // Chẩn đoán sức khỏe mặc định
-            healthStatus: healthStatus || "Healthy", // Trạng thái sức khỏe mặc định
+            heartBeat: heartBeat || 0,  
+            spo2: spo2 || 0,           
+            bodyTemp: bodyTemp || 0,   
+            ambientTemp: ambientTemp || 0, 
+            healthDiagnosis: healthDiagnosis || [], 
+            healthStatus: healthStatus || "Healthy", 
         });
 
-        // Lưu bản ghi healthData vào DB
         await newHealthData.save();
         const newPatient = new User({
             username,
@@ -62,7 +62,6 @@ const createHealthDataForUser = async (req, res) => {
     }
 };
 
-// Lấy dữ liệu sức khỏe cho người dùng
 const getHealthDataForUser = async (req, res) => {
     const { userId } = req.params;
 

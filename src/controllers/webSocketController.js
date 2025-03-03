@@ -13,24 +13,20 @@ const setupWebSocketController = async (wss, ws, message) => {
     }
 
     try {
-        // Phân tích cú pháp chuỗi JSON nhận được
         const data = JSON.parse(message);
         console.log('Parsed data:', data);
-
-        // Chẩn đoán sức khỏe và trạng thái sức khỏe
+      
         const healthDiagnosis = healthService.diagnoseHealth(data.heartBeat, data.spo2, data.bodyTemp);
         const healthStatus = healthService.diagnoseHealthStatus(data.heartBeat, data.spo2, data.bodyTemp);
-
-        // Thêm chẩn đoán vào dữ liệu
+       
         data.healthDiagnosis = healthDiagnosis;
         data.healthStatus = healthStatus;
 
-        // Kiểm tra nếu nhịp tim hoặc SpO2 thay đổi
         const heartRateChanged = data.heartBeat !== lastHeartRate;
         const spO2Changed = data.spo2 !== lastSpO2;
 
         if (heartRateChanged || spO2Changed) {
-            // Lưu dữ liệu vào MongoDB khi có thay đổi nhịp tim hoặc SpO2
+           
             const newHealthData = await healthService.saveHealthData(data, healthDiagnosis, healthStatus);
             console.log('Data saved successfully:', newHealthData);
 
@@ -38,7 +34,6 @@ const setupWebSocketController = async (wss, ws, message) => {
             lastHeartRate = data.heartBeat;
             lastSpO2 = data.spo2;
 
-            // Cập nhật mảng healthData trong User (bệnh nhân)
             const isPatientUpdated = await healthService.updatePatientHealthData(data.patientId, newHealthData._id);
             if (isPatientUpdated) {
                 console.log('Health data added to patient');
@@ -49,7 +44,6 @@ const setupWebSocketController = async (wss, ws, message) => {
             console.log('No significant change in heart rate or SpO2, data not saved.');
         }
 
-        // Gửi dữ liệu mới đến tất cả các client kết nối
         wss.clients.forEach((client) => {
             if (client.readyState === client.OPEN) {
                 client.send(JSON.stringify(data));
