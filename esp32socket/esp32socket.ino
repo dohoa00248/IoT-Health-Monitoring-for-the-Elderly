@@ -32,7 +32,7 @@ int ledLowSpo2 = 25;
 int ledHighTemp = 26;
 
 // Thông tin WebSocket server
-
+const char* websocketServer = "iot-health-monitoring-for-the-elderly.onrender.com";  // Địa chỉ WebSocket server
 const char* websocketServer = "192.168.65.58";  // Địa chỉ WebSocket server
 
 const int port = 8080;
