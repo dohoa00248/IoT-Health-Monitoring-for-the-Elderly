@@ -3,7 +3,7 @@ $(document).ready(function () {
   //   "wss://iot-health-monitoring-for-the-elderly.onrender.com"
   // );
   const ws = new WebSocket(
-    "ws://iot-health-monitoring-for-the-elderly.onrender.com:10000"
+    "wss://iot-health-monitoring-for-the-elderly.onrender.com"
   );
   // const ws = new WebSocket("ws://192.168.2.127:3000");
   let heartRateData = {
