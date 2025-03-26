@@ -53,7 +53,7 @@ const setupWebSocketServer = (server) => {
 
     ws.send(JSON.stringify({ message: "Welcome to the WebSocket server!" }));
     ws.on("message", async (message) => {
-      console.log("Received data from client:", message);
+      console.log("Received data from client1:", message);
 
       // Kiểm tra nếu message là Buffer
       if (Buffer.isBuffer(message)) {

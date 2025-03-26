@@ -9,12 +9,12 @@
 
 // Cấu hình Wi-Fi
 
-// #define WIFI_SSID "DTH 999"
-// #define WIFI_PASSWORD "9999999990"
-
-
-#define WIFI_SSID "Wifi chùa"
+#define WIFI_SSID "DTH 999"
 #define WIFI_PASSWORD "9999999990"
+
+
+// #define WIFI_SSID "Wifi chùa"
+// #define WIFI_PASSWORD "9999999990"
 
 // Địa chỉ I2C và các cảm biến
 #define I2C_ADDRESS 0x57
@@ -32,10 +32,12 @@ int ledLowSpo2 = 25;
 int ledHighTemp = 26;
 
 // Thông tin WebSocket server
-const char* websocketServer = "iot-health-monitoring-for-the-elderly.onrender.com";  // Địa chỉ WebSocket server
-const char* websocketServer = "192.168.65.58";  // Địa chỉ WebSocket server
+// const char* websocketServer = "iot-health-monitoring-for-the-elderly.onrender.com";  // Địa chỉ WebSocket server
+// const char* websocketServer = "192.168.65.58";  // Địa chỉ WebSocket server
+const char* websocketServer = "192.168.2.127";  // Địa chỉ WebSocket server
+// const char* websocketServer = "localhost";  // Địa chỉ WebSocket server
 
-const int port = 8080;
+const int port = 3000;
 WebSocketsClient webSocket;
 
 // String patientID = "P01";
