@@ -52,7 +52,7 @@ webRoutes(app);
 
 // Cấu hình và chạy server
 const PORT = process.env.PORT || 3000;
-const HOSTNAME = process.env.HOST_NAME || "localhost" || getLocalIP();
+const HOSTNAME = process.env.HOST_NAME || "localhost";
 
 // Bắt đầu server và lắng nghe kết nối
 server.listen(PORT, HOSTNAME, () => {
