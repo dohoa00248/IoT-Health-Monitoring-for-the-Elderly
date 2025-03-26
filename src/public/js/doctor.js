@@ -1,8 +1,8 @@
 $(document).ready(function () {
-  const ws = new WebSocket(
-    "ws://iot-health-monitoring-for-the-elderly.onrender.com"
-  );
-  // const ws = new WebSocket("ws://192.168.65.58:8080");
+  // const ws = new WebSocket(
+  //   "ws://iot-health-monitoring-for-the-elderly.onrender.com:3000"
+  // );
+  const ws = new WebSocket("ws://192.168.2.127:3000");
   let heartRateData = {
     labels: [],
     datasets: [
