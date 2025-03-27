@@ -141,7 +141,7 @@ const setupWebSocketServer = (server) => {
   });
 
   console.log("WebSocket server running...");
-  console.log("WebSocket server is running on ws://localhost:8080");
+  // console.log("WebSocket server is running on ws://localhost:8080");
 };
 
 export default setupWebSocketServer;

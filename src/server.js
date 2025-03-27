@@ -8,7 +8,6 @@ import setupMethodOverride from "./middleware/methodOverrideMiddleware.js";
 import webRoutes from "./routes/web.js";
 import connectDB from "./config/db.connect.js";
 import configStaticFolders from "./config/static.folder.js";
-import getLocalIP from "./config/local.config.js";
 import cookieParser from "cookie-parser";
 import corsMiddleware from "./middleware/corsMiddleware.js";
 
