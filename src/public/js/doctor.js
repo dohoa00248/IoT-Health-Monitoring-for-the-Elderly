@@ -5,7 +5,7 @@ $(document).ready(function () {
   // const ws = new WebSocket(
   //   "wss://iot-health-monitoring-for-the-elderly.onrender.com:10000"
   // );
-  const ws = new WebSocket("ws://192.168.2.127:3000");
+  const ws = new WebSocket("wss://192.168.2.127:3000");
   // const ws = new WebSocket("ws://" + window.location.hostname);
   let heartRateData = {
     labels: [],
