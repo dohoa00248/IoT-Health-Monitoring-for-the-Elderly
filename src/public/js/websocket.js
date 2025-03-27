@@ -1,6 +1,6 @@
 $(document).ready(function () {
-  const ws = new WebSocket("ws://192.168.26:8080");
-
+  //   const ws = new WebSocket("ws://192.168.26:8080");
+  const ws = new WebSocket("ws://192.168.2.127:3000");
   let heartRateData = {
     labels: [],
     datasets: [
