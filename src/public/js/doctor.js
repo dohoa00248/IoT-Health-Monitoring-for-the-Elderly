@@ -2,11 +2,11 @@ $(document).ready(function () {
   // const ws = new WebSocket(
   //   "wss://iot-health-monitoring-for-the-elderly.onrender.com"
   // );
-  const ws = new WebSocket(
-    "wss://iot-health-monitoring-for-the-elderly.onrender.com:10000"
-  );
+  // const ws = new WebSocket(
+  //   "wss://iot-health-monitoring-for-the-elderly.onrender.com:10000"
+  // );
   // const ws = new WebSocket("ws://192.168.2.127:10000");
-  // const ws = new WebSocket("wss://192.168.0.26:8080");
+  const ws = new WebSocket("wss://192.168.0.26:8080");
   let heartRateData = {
     labels: [],
     datasets: [
