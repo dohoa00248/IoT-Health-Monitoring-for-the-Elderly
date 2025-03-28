@@ -52,7 +52,6 @@ const setupWebSocketServer = (server) => {
     console.log("A user connected");
 
     ws.send(JSON.stringify({ message: "Welcome to the WebSocket server!" }));
-
     ws.on("message", async (message) => {
       console.log("Received data from client:", message);
 
@@ -64,72 +63,61 @@ const setupWebSocketServer = (server) => {
       try {
         const data = JSON.parse(message);
 
-        // Kiểm tra dữ liệu hợp lệ
-        if (isNaN(data.heartBeat) || isNaN(data.spo2) || isNaN(data.bodyTemp)) {
-          ws.send(
-            JSON.stringify({
-              status: "error",
-              message: "Invalid data received, please check the format.",
-            })
-          );
-          return;
-        }
-
         console.log("Parsed data:", data);
 
-        const healthDiagnosis = diagnoseHealth(
-          data.heartBeat,
-          data.spo2,
-          data.bodyTemp
-        );
-        const healthStatus = diagnoseHealthStatus(
-          data.heartBeat,
-          data.spo2,
-          data.bodyTemp
-        );
+        // const healthDiagnosis = diagnoseHealth(
+        //   data.heartBeat,
+        //   data.spo2,
+        //   data.bodyTemp
+        // );
+        // const healthStatus = diagnoseHealthStatus(
+        //   data.heartBeat,
+        //   data.spo2,
+        //   data.bodyTemp
+        // );
 
-        data.healthDiagnosis = healthDiagnosis;
-        data.healthStatus = healthStatus;
+        // data.healthDiagnosis = healthDiagnosis;
+        // data.healthStatus = healthStatus;
 
-        const heartRateChanged = data.heartBeat !== lastHeartRate;
-        const spO2Changed = data.spo2 !== lastSpO2;
+        // const heartRateChanged = data.heartBeat !== lastHeartRate;
+        // const spO2Changed = data.spo2 !== lastSpO2;
 
-        if (heartRateChanged || spO2Changed) {
-          const newHealthData = new HealthData({
-            deviceID: data.deviceID,
-            heartBeat: data.heartBeat,
-            spo2: data.spo2,
-            bodyTemp: data.bodyTemp,
-            ambientTemp: data.ambientTemp || 0,
-            healthDiagnosis: healthDiagnosis,
-            healthStatus: healthStatus,
-          });
+        // if (heartRateChanged || spO2Changed) {
+        //   const newHealthData = new HealthData({
+        //     deviceID: data.deviceID,
+        //     heartBeat: data.heartBeat,
+        //     spo2: data.spo2,
+        //     bodyTemp: data.bodyTemp,
+        //     ambientTemp: data.ambientTemp || 0,
+        //     healthDiagnosis: healthDiagnosis,
+        //     healthStatus: healthStatus,
+        //   });
 
-          await newHealthData.save();
+        //   await newHealthData.save();
 
-          console.log("Data saved successfully:", newHealthData);
+        //   console.log("Data saved successfully:", newHealthData);
 
-          lastHeartRate = data.heartBeat;
-          lastSpO2 = data.spo2;
+        //   lastHeartRate = data.heartBeat;
+        //   lastSpO2 = data.spo2;
 
-          const patient = await User.findById(data.patientId);
-          if (patient) {
-            patient.healthData.push(newHealthData._id);
-            await patient.save();
-            console.log("Health data added to patient");
-          } else {
-            console.log("Patient not found with id:", data.patientId);
-          }
-        } else {
-          console.log(
-            "No significant change in heart rate or SpO2, data not saved."
-          );
-        }
+        //   const patient = await User.findById(data.patientId);
+        //   if (patient) {
+        //     patient.healthData.push(newHealthData._id);
+        //     await patient.save();
+        //     console.log("Health data added to patient");
+        //   } else {
+        //     console.log("Patient not found with id:", data.patientId);
+        //   }
+        // } else {
+        //   console.log(
+        //     "No significant change in heart rate or SpO2, data not saved."
+        //   );
+        // }
 
         wss.clients.forEach((client) => {
           if (client.readyState === client.OPEN) {
             client.send(JSON.stringify(data));
-            console.log(data);
+            // console.log(data);
           }
         });
       } catch (error) {
@@ -154,6 +142,7 @@ const setupWebSocketServer = (server) => {
   });
 
   console.log("WebSocket server running...");
+  // console.log("WebSocket server is running on ws://localhost:8080");
 };
 
 export default setupWebSocketServer;
