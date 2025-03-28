@@ -43,10 +43,10 @@ const char* websocketServer = "ws://iot-health-monitoring-for-the-elderly.onrend
 // const char* websocketServer = "192.168.65.58";  // Địa chỉ WebSocket server
 // const char* websocketServer = "192.168.2.127";  // Địa chỉ WebSocket server
 
-// const int port = 3000;
+const int port = 3000;
 // const int port = 10000;
 // const int port = 8080;
-const int port = 443;
+// const int port = 443;
 WebSocketsClient webSocket;
 
 // String patientID = "P01";
