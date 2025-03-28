@@ -52,8 +52,9 @@ const setupWebSocketServer = (server) => {
     console.log("A user connected");
 
     ws.send(JSON.stringify({ message: "Welcome to the WebSocket server!" }));
+
     ws.on("message", async (message) => {
-      console.log("Received data from client1:", message);
+      console.log("Received data from client:", message);
 
       // Kiểm tra nếu message là Buffer
       if (Buffer.isBuffer(message)) {
@@ -62,6 +63,17 @@ const setupWebSocketServer = (server) => {
 
       try {
         const data = JSON.parse(message);
+
+        // Kiểm tra dữ liệu hợp lệ
+        if (isNaN(data.heartBeat) || isNaN(data.spo2) || isNaN(data.bodyTemp)) {
+          ws.send(
+            JSON.stringify({
+              status: "error",
+              message: "Invalid data received, please check the format.",
+            })
+          );
+          return;
+        }
 
         console.log("Parsed data:", data);
 
@@ -142,7 +154,6 @@ const setupWebSocketServer = (server) => {
   });
 
   console.log("WebSocket server running...");
-  // console.log("WebSocket server is running on ws://localhost:8080");
 };
 
 export default setupWebSocketServer;
