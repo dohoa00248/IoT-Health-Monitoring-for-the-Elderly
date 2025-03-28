@@ -117,6 +117,7 @@ const setupWebSocketServer = (server) => {
         wss.clients.forEach((client) => {
           if (client.readyState === client.OPEN) {
             client.send(JSON.stringify(data));
+            console.log(data);
           }
         });
       } catch (error) {
