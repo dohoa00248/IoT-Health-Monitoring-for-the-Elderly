@@ -1,36 +1,28 @@
-import { configDotenv } from 'dotenv';
-import jwt from 'jsonwebtoken';
-import User from '../models/User.js';
+import { configDotenv } from "dotenv";
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
 configDotenv();
 
 function authenticateToken(req, res, next) {
-  
-    const token = req.headers['authorization']?.split(' ')[1];
+  // Lấy token từ header Authorization
+  const token = req.header("Authorization")?.replace("Bearer ", "");
 
-    if (!token) {
-        return res.redirect('/api/v1/auth/');
-        // return res.status(401).json({ message: 'Authorization header is required. Token missing.' });
-    }
+  if (!token) {
+    return res
+      .status(401)
+      .json({ message: "Access denied. No token provided." });
+  }
 
-    jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, decoded) => {
-        if (err) {
-            return res.status(401).json({ message: 'Invalid token', error: err.message });
-        }
+  try {
+    // Giải mã token và thêm thông tin người dùng vào request
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    req.user = decoded; // Lưu thông tin người dùng trong req.user
 
-        try {
-            const user = await User.findById(decoded._id);
-            if (!user) {
-                return res.status(401).json({ message: 'User not found' });
-            }
-
-            // Lưu thông tin người dùng đã giải mã vào req.user
-            req.user = decoded; // Lưu thông tin user vào request để các route có thể sử dụng
-            next();  // Chuyển sang middleware hoặc route tiếp theo
-        } catch (err) {
-            return res.status(500).json({ message: 'Server error while checking user', error: err.message });
-        }
-    });
+    next(); // Tiếp tục xử lý request
+  } catch (error) {
+    return res.status(400).json({ message: "Invalid token." });
+  }
 }
 
 export default authenticateToken;

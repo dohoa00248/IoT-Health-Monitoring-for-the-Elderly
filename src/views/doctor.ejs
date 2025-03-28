@@ -9,7 +9,7 @@
     <script src="/js/jquery-3.7.1.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/doctor.js"></script>
-    <script src="/js/websocket.js"></script>
+    <!-- <script src="/js/websocket.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -77,45 +77,6 @@
       </div>
 
       <div class="card shadow-lg mb-4">
-        <div class="card-header bg-success text-white">
-          <h3 class="mb-0">Danh Sách Bệnh Nhân</h3>
-        </div>
-        <div class="card-body">
-          <div class="d-flex justify-content-between mb-3">
-            <!-- Nút Thêm Hồ Sơ Bệnh Nhân -->
-            <button id="addPatientBtn" class="btn btn-success">
-              Tạo Hồ Sơ Bệnh Nhân
-            </button>
-          </div>
-          <!-- Thêm ô tìm kiếm bệnh nhân -->
-          <div class="d-flex mb-4">
-            <input
-              type="text"
-              id="searchPatient"
-              class="form-control"
-              placeholder="Nhập tên bệnh nhân (First/Last Name)"
-            />
-            <button id="searchBtn" class="btn btn-primary ml-2">
-              Tìm Bệnh Nhân
-            </button>
-          </div>
-          <table class="table table-bordered table-striped table-hover">
-            <thead class="thead-dark">
-              <tr>
-                <th>ID Bệnh Nhân</th>
-                <th>Tên Bệnh Nhân</th>
-                <th>Email</th>
-                <th>Action</th>
-                <!-- Cột mới cho nút Xem Hồ Sơ -->
-              </tr>
-            </thead>
-            <tbody id="patientListContainer">
-              <!-- Danh sách bệnh nhân sẽ được chèn vào đây -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="card shadow-lg mb-4">
         <div class="card-header bg-primary text-white">
           <h3 class="mb-0">Real-Time Health Data</h3>
         </div>
@@ -124,7 +85,6 @@
             <thead class="thead-dark">
               <tr>
                 <th>Device ID</th>
-                <!-- <th>Patient ID</th> -->
                 <th>Heart Beat</th>
                 <th>SpO2</th>
                 <th>Body Temperature</th>
@@ -136,7 +96,6 @@
             <tbody>
               <tr>
                 <td id="deviceID">N/A</td>
-                <!-- <td id="patientID">N/A</td> -->
                 <td id="heartBeat">0 BPM</td>
                 <td id="spo2">0%</td>
                 <td id="bodyTemp">N/A</td>
@@ -148,6 +107,7 @@
           </table>
         </div>
       </div>
+
       <div class="card shadow-lg">
         <div class="card-header bg-info text-white">
           <h3 class="mb-0">Health Charts</h3>
@@ -169,11 +129,14 @@
           </div>
         </div>
       </div>
-
-      <button id="viewHistoryBtn" class="btn btn-primary">Xem Lịch sử</button>
-      <button id="backButton" class="btn btn-secondary">Quay lại trang</button>
-      <button id="logoutBtn" class="btn btn-danger">Đăng Xuất</button>
-      <!-- Đăng xuất -->
+      <div class="d-flex justify-content-between mt-4">
+        <button id="viewHistoryBtn" class="btn btn-primary">Xem Lịch sử</button>
+        <button id="backButton" class="btn btn-secondary">
+          Quay lại trang
+        </button>
+        <button id="viewPatientsBtn" class="btn btn-info">Xem Bệnh Nhân</button>
+        <button id="logoutButton" class="btn btn-danger">Đăng xuất</button>
+      </div>
 
       <!-- Modal History -->
       <div
@@ -204,7 +167,6 @@
                 <thead class="thead-dark">
                   <tr>
                     <th>Device ID</th>
-                    <!-- <th>Patient ID</th> -->
                     <th>Heart Beat</th>
                     <th>SpO2</th>
                     <th>Body Temperature</th>
@@ -235,19 +197,19 @@
       </div>
     </div>
 
-    <!-- !-- Modal để hiển thị dữ liệu sức khỏe của bệnh nhân -->
+    <!-- Modal for viewing patients -->
     <div
       class="modal fade"
-      id="healthDataModal"
+      id="patientsModal"
       tabindex="-1"
-      aria-labelledby="healthDataModalLabel"
+      aria-labelledby="patientsModalLabel"
       aria-hidden="true"
     >
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="healthDataModalLabel">
-              Lịch Sử Dữ Liệu Sức Khỏe
+            <h5 class="modal-title" id="patientsModalLabel">
+              Danh Sách Bệnh Nhân
             </h5>
             <button
               type="button"
@@ -257,21 +219,19 @@
             ></button>
           </div>
           <div class="modal-body">
-            <table class="table table-bordered table-striped table-hover">
-              <thead>
+            <table
+              class="table table-bordered table-striped table-hover"
+              id="patientsTable"
+            >
+              <thead class="thead-dark">
                 <tr>
-                  <th>Device ID</th>
-                  <th>Heart Beat</th>
-                  <th>SpO2</th>
-                  <th>Body Temperature</th>
-                  <th>Ambient Temperature</th>
-                  <th>Health Diagnosis</th>
-                  <th>Health Status</th>
-                  <th>Created At</th>
-                  <th>Updated At</th>
+                  <th>Tên Bệnh Nhân</th>
+                  <th>Email</th>
                 </tr>
               </thead>
-              <tbody></tbody>
+              <tbody>
+                <!-- Dữ liệu bệnh nhân sẽ được điền vào đây -->
+              </tbody>
             </table>
           </div>
           <div class="modal-footer">
@@ -298,180 +258,67 @@
           decodedToken.firstName + " " + decodedToken.lastName
         );
         $("#doctorEmail").text("Email: " + decodedToken.email);
-
-        // Lấy danh sách bệnh nhân từ token (ID bệnh nhân)
-        if (decodedToken.patients && Array.isArray(decodedToken.patients)) {
-          // Gọi hàm để lấy thông tin chi tiết bệnh nhân
-          fetchPatientDetails(decodedToken.patients);
-        } else {
-          console.error("No patients found in the token");
-        }
       } else {
         // Nếu không có token, chuyển hướng về trang đăng nhập
         window.location.href = "/api/v1/auth";
       }
-
-      // Hàm lấy thông tin chi tiết bệnh nhân từ mảng patients[] trong token
-      function fetchPatientDetails(patientIds) {
-        var token = localStorage.getItem("token"); // Lấy token từ localStorage
-        var patientListContainer = $("#patientListContainer");
-        patientListContainer.empty(); // Xóa danh sách bệnh nhân hiện tại
-
-        // Duyệt qua mảng ID bệnh nhân và lấy thông tin chi tiết của mỗi bệnh nhân
-        patientIds.forEach(function (patientId) {
-          $.ajax({
-            url: `/api/v1/user/patient/${patientId}`, // Gọi API để lấy thông tin bệnh nhân
-            method: "GET",
-            headers: { Authorization: `Bearer ${token}` },
-            success: function (patientData) {
-              var patientRow = `<tr>
-                        <td>${patientData._id || "N/A"}</td>
-                        <td>${patientData.firstName || "N/A"} ${
-                patientData.lastName || "N/A"
-              }</td>
-                        <td>${patientData.email || "N/A"}</td>
-                        <td>
-                            <button id="viewHealthDataBtn" class="btn btn-info">Xem Dữ Liệu Sức Khỏe</button>
-                            <button id="updateHealthDataBtn" class="btn btn-warning" onclick="window.location.href='/api/v1/user/update-healthdata/${
-                              patientData._id
-                            }'">Cập Nhật Sức Khỏe</button>
-
-                        </td>
-                        
-                    </tr>`;
-
-              patientListContainer.append(patientRow);
-            },
-            error: function () {
-              console.error("Không thể tải thông tin bệnh nhân");
-            },
-          });
-        });
-      }
-
-      // Xử lý khi nhấn nút "Tìm Bệnh Nhân"
-      $("#searchBtn").click(function () {
-        var searchQuery = $("#searchPatient").val().trim(); // Lấy giá trị từ ô input tìm kiếm
-
-        if (searchQuery) {
-          // Gửi yêu cầu tìm kiếm bệnh nhân theo tên
-          $.ajax({
-            url: "/api/v1/user/patients/search", // API endpoint tìm kiếm bệnh nhân
-            method: "GET",
-            data: { query: searchQuery }, // Truyền từ khóa tìm kiếm
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            }, // Gửi token xác thực
-            success: function (data) {
-              if (Array.isArray(data.patients)) {
-                displayPatients(data.patients); // Hiển thị danh sách bệnh nhân tìm được
-              } else {
-                alert("Không có bệnh nhân nào khớp với tìm kiếm!");
-              }
-            },
-            error: function () {
-              alert("Có lỗi xảy ra khi tìm kiếm bệnh nhân!");
-            },
-          });
-        } else {
-          alert("Vui lòng nhập tên bệnh nhân để tìm kiếm.");
-        }
-      });
-
-      // Hàm hiển thị danh sách bệnh nhân khi tìm kiếm
-      function displayPatients(patients) {
-        var patientListContainer = $("#patientListContainer");
-        patientListContainer.empty(); // Xóa danh sách bệnh nhân hiện tại
-
-        if (patients.length === 0) {
-          patientListContainer.append(
-            '<tr><td colspan="4">Không có kết quả tìm kiếm.</td></tr>'
-          );
-          return;
-        }
-
-        // Duyệt qua mảng bệnh nhân và hiển thị vào bảng
-        patients.forEach(function (patient) {
-          var patientRow = `<tr>
-                <td>${patient._id || "N/A"}</td>
-                <td>${patient.firstName || "N/A"} ${
-            patient.lastName || "N/A"
-          }</td>
-                <td>${patient.email || "N/A"}</td>
-                <td>
-                    <button id="viewHealthDataBtn" class="btn btn-info">Xem Dữ Liệu Sức Khỏe</button>
-                   
-                   <button id="updateHealthDataBtn" class="btn btn-warning" onclick="window.location.href='/api/v1/user/update-healthdata/${
-                     patientData._id
-                   }'">Cập Nhật Sức Khỏe</button>
-                    
-                </td>
-                 
-            </tr>`;
-          patientListContainer.append(patientRow);
-        });
-
-        // Add click event to each "View Health History" button
-        $(".viewHealthHistoryBtn").click(function () {
-          var patientId = $(this).data("patient-id");
-          viewHealthHistory(patientId); // Function xử lý để xem lịch sử sức khỏe của bệnh nhân
-        });
-      }
     </script>
-
-    <script>
-      //link chuyen huong
-      $("#addPatientBtn").click(function () {
-        // Chuyển hướng đến trang tạo hồ sơ bệnh nhân
-        window.location.href = "/api/v1/user/addpatient-doctor"; // Thay đổi URL cho phù hợp
-      });
-    </script>
-
     <script>
       $(document).ready(function () {
-        // Xử lý khi nhấn nút "Xem Hồ Sơ Bệnh Nhân"
-        $(document).on("click", "#viewHealthDataBtn", function () {
-          const patientId = $(this).closest("tr").find("td:first").text(); // Lấy ID bệnh nhân từ dòng của bảng
+        // Khi nhấn nút "Xem Bệnh Nhân"
+        $("#viewPatientsBtn").on("click", function () {
+          var token = localStorage.getItem("token"); // Lấy token từ localStorage
 
-          // Gửi yêu cầu GET để lấy dữ liệu sức khỏe của bệnh nhân
-          $.ajax({
-            url: `/api/v1/health/${patientId}`, // API route của bạn
-            method: "GET",
-            success: function (data) {
-              if (Array.isArray(data) && data.length > 0) {
-                // Xóa dữ liệu cũ trong modal
-                $("#healthDataModal tbody").empty();
+          if (token) {
+            // Giải mã token để lấy doctorId
+            var decodedToken = jwt_decode(token); // Giải mã token
+            console.log(decodedToken); // In ra token đã giải mã để kiểm tra
 
-                // Duyệt qua mảng healthData[] và thêm từng item vào modal
-                data.forEach((item) => {
-                  const row = `<tr>
-                            <td>${item.deviceID || "N/A"}</td>
-                            <td>${item.heartBeat || "N/A"}</td>
-                            <td>${item.spo2 || "N/A"}</td>
-                            <td>${item.bodyTemp || "N/A"}</td>
-                            <td>${item.ambientTemp || "N/A"}</td>
-                            <td>${item.healthDiagnosis || "N/A"}</td>
-                            <td>${item.healthStatus || "N/A"}</td>
-                            <td>${new Date(
-                              item.createdAt
-                            ).toLocaleString()}</td>
-                            <td>${new Date(
-                              item.updatedAt
-                            ).toLocaleString()}</td>
-                        </tr>`;
-                  $("#healthDataModal tbody").append(row);
-                });
+            var doctorId = decodedToken.id; // Lấy doctorId từ decoded token
 
-                // Mở modal để hiển thị lịch sử sức khỏe
-                $("#healthDataModal").modal("show");
-              } else {
-                alert("Không có dữ liệu sức khỏe cho bệnh nhân này");
-              }
-            },
-            error: function () {
-              alert("Có lỗi xảy ra khi tải thông tin sức khỏe của bệnh nhân");
-            },
-          });
+            if (!doctorId) {
+              console.error("Doctor ID không tồn tại trong token.");
+              alert("Không tìm thấy doctorId trong token.");
+              return; // Dừng lại nếu không có doctorId
+            }
+
+            // Gửi yêu cầu AJAX tới API
+            $.ajax({
+              url: `/api/v1/user/patients/${doctorId}`, // Dùng doctorId trong URL
+              type: "GET",
+              success: function (response) {
+                // Kiểm tra nếu có bệnh nhân
+                if (response.patients && response.patients.length > 0) {
+                  var patients = response.patients;
+                  var patientsTableBody = $("#patientsTable tbody");
+
+                  // Xóa các dữ liệu cũ trong bảng
+                  patientsTableBody.empty();
+
+                  // Điền dữ liệu bệnh nhân vào bảng
+                  patients.forEach(function (patient) {
+                    var row = `<tr>
+                <td>${patient.firstName} ${patient.lastName}</td>
+                <td>${patient.email}</td>
+              </tr>`;
+                    patientsTableBody.append(row);
+                  });
+
+                  // Hiển thị modal
+                  $("#patientsModal").modal("show");
+                } else {
+                  alert("Không có bệnh nhân nào.");
+                }
+              },
+              error: function (error) {
+                console.error(error);
+                alert("Đã xảy ra lỗi khi lấy dữ liệu bệnh nhân.");
+              },
+            });
+          } else {
+            // Nếu không có token, chuyển hướng về trang đăng nhập
+            window.location.href = "/api/v1/auth";
+          }
         });
       });
     </script>

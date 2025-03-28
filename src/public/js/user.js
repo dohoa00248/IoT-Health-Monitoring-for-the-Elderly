@@ -135,33 +135,33 @@ $(document).ready(function () {
         if (Array.isArray(data) && data.length > 0) {
           data.forEach((item) => {
             const tableRow = `<tr>
-                                    <td>${item.deviceID || "N/A"}</td>
-                                    <td>${item.heartBeat || "0 BPM"}</td>
-                                    <td>${item.spo2 || "0%"}</td>
-                                    <td>${item.bodyTemp || "N/A"}</td>
-                                    <td>${item.ambientTemp || "N/A"}</td>
-                                    <td>${
-                                      Array.isArray(item.healthDiagnosis) &&
-                                      item.healthDiagnosis.length > 0
-                                        ? item.healthDiagnosis.join(", ")
-                                        : "N/A"
-                                    }</td>
-                                    <td>${item.healthStatus || "N/A"}</td>
-                                    <td>${
-                                      item.createdAt
-                                        ? new Date(
-                                            item.createdAt
-                                          ).toLocaleString()
-                                        : "N/A"
-                                    }</td>
-                                    <td>${
-                                      item.updatedAt
-                                        ? new Date(
-                                            item.updatedAt
-                                          ).toLocaleString()
-                                        : "N/A"
-                                    }</td>
-                                </tr>`;
+                                      <td>${item.deviceID || "N/A"}</td>
+                                      <td>${item.heartBeat || "0 BPM"}</td>
+                                      <td>${item.spo2 || "0%"}</td>
+                                      <td>${item.bodyTemp || "N/A"}</td>
+                                      <td>${item.ambientTemp || "N/A"}</td>
+                                      <td>${
+                                        Array.isArray(item.healthDiagnosis) &&
+                                        item.healthDiagnosis.length > 0
+                                          ? item.healthDiagnosis.join(", ")
+                                          : "N/A"
+                                      }</td>
+                                      <td>${item.healthStatus || "N/A"}</td>
+                                      <td>${
+                                        item.createdAt
+                                          ? new Date(
+                                              item.createdAt
+                                            ).toLocaleString()
+                                          : "N/A"
+                                      }</td>
+                                      <td>${
+                                        item.updatedAt
+                                          ? new Date(
+                                              item.updatedAt
+                                            ).toLocaleString()
+                                          : "N/A"
+                                      }</td>
+                                  </tr>`;
             $("#historyTable tbody").append(tableRow);
           });
         } else {
@@ -177,22 +177,11 @@ $(document).ready(function () {
     });
   });
 
-  $("#exportExcelBtn").click(function () {
-    const table = $("#historyTable");
-    const wb = XLSX.utils.table_to_book(table[0], {
-      sheet: "History Data",
-    });
-    XLSX.writeFile(wb, "Health_Data_History.xlsx");
-  });
-
   $("#backButton").click(function () {
     window.history.back();
   });
-
-  //link chuyen huong
-  $("#addPatientBtn").click(function () {
-    // Chuyển hướng đến trang tạo hồ sơ bệnh nhân
-    window.location.href = "/api/v1/user/addpatient-doctor"; // Thay đổi URL cho phù hợp
+  $("#viewHealthDataBtn").click(function () {
+    window.location.href = "/health-data"; // Chuyển hướng về trang dữ liệu sức khỏe
   });
   $("#logoutButton").click(function () {
     localStorage.removeItem("token");

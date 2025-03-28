@@ -1,103 +1,116 @@
 <!DOCTYPE html>
 <html lang="vi">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Đăng Nhập</title>
     <link rel="stylesheet" href="/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/css/signin.css">
+    <link rel="stylesheet" href="/css/signin.css" />
     <script src="/js/jquery-3.7.1.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <h1 class="text-center mt-5">Đăng Nhập</h1>
-                <form id="loginForm" method="post">
-                    <div class="form-group">
-                        <label for="username">Tên đăng nhập:</label>
-                        <input type="text" id="username" name="username" class="form-control" required
-                            placeholder="Nhập tên đăng nhập">
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Mật khẩu:</label>
-                        <input type="password" id="password" name="password" class="form-control" required
-                            placeholder="Nhập mật khẩu">
-                    </div>
-
-                    <button type="submit" class="btn btn-primary btn-block mt-3">Đăng nhập</button>
-                    <div id="message" class="mt-3"></div> <!-- Duy trì thông báo lỗi/thành công tại đây -->
-
-
-                    <div class="text-center mt-2">
-                        <a href="/">Quay lại trang chủ</a>
-                    </div>
-                </form>
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <h1 class="text-center mt-5">Đăng Nhập</h1>
+          <form id="loginForm" method="post">
+            <div class="form-group">
+              <label for="username">Tên đăng nhập:</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                class="form-control"
+                required
+                placeholder="Nhập tên đăng nhập"
+              />
             </div>
+            <div class="form-group">
+              <label for="password">Mật khẩu:</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-control"
+                required
+                placeholder="Nhập mật khẩu"
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block mt-3">
+              Đăng nhập
+            </button>
+            <div id="message" class="mt-3"></div>
+            <!-- Duy trì thông báo lỗi/thành công tại đây -->
+
+            <div class="text-center mt-2">
+              <a href="/">Quay lại trang chủ</a>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
 
     <script>
-        $(document).ready(function () {
-            $('#loginForm').on('submit', function (event) {
-                event.preventDefault();  // Ngăn chặn gửi form mặc định
+      $(document).ready(function () {
+        $("#loginForm").on("submit", function (event) {
+          event.preventDefault(); // Ngăn chặn gửi form mặc định
 
-                const username = $('#username').val();
-                const password = $('#password').val();
-                const messageDiv = $('#message');
+          const username = $("#username").val();
+          const password = $("#password").val();
+          const messageDiv = $("#message");
 
-                // Gửi yêu cầu đăng nhập tới API
-                $.ajax({
-                    url: '/api/v1/auth/signin',  // URL của API đăng nhập
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ username, password }),
-                    success: function (res) {
-                        const token = res.token;
-                        if (token) {
-                            // Lưu token vào localStorage
-                            localStorage.setItem('token', token);
+          // Gửi yêu cầu đăng nhập tới API
+          $.ajax({
+            url: "/api/v1/auth/signin", // URL của API đăng nhập
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ username, password }),
+            success: function (res) {
+              const token = res.token;
+              if (token) {
+                // Lưu token vào localStorage
+                localStorage.setItem("token", token);
+                console.log("Token saved:", token);
+                // Giải mã token để lấy thông tin người dùng
+                const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                const userId = decodedToken; // Lấy _id của người dùng từ token
 
-                            // Giải mã token để lấy thông tin người dùng
-                            const decodedToken = JSON.parse(atob(token.split('.')[1]));
-                            const userId = decodedToken;  // Lấy _id của người dùng từ token
+                // console.log("User ID: ", userId); // In ra _id để kiểm tra
 
+                // // Giải mã token để lấy role (nếu có)
+                const role = decodedToken.role;
 
-                            console.log("User ID: ", userId);  // In ra _id để kiểm tra
-
-                            // Giải mã token để lấy role (nếu có)
-                            const role = decodedToken.role;
-
-                            // Kiểm tra role và chuyển hướng đến các trang tương ứng
-                            if (role === 1) {
-                                // Admin
-                                window.location.href = '/api/v1/user/admin/dashboard';
-                            } else if (role === 2) {
-                                // Bác sĩ
-                                window.location.href = '/api/v1/user/doctor/dashboard';
-                            } else if (role === 3) {
-                                // Người dùng (bệnh nhân)
-                                window.location.href = '/api/v1/user/';
-                            } else {
-                                // Nếu không phải là một trong các role trên, chuyển về trang chủ
-                                window.location.href = '/';
-                            }
-                        } else {
-                            messageDiv.removeClass('alert-success').addClass('alert-danger');
-                            messageDiv.text('Lỗi: Không nhận được token');
-                        }
-                    },
-                    error: function (xhr) {
-                        messageDiv.removeClass('alert-success').addClass('alert-danger');
-                        messageDiv.text(`Lỗi: ${xhr.responseText}`);
-                    }
-                });
-            });
+                // Kiểm tra role và chuyển hướng đến các trang tương ứng
+                if (role === 1) {
+                  // Admin
+                  window.location.href = "/api/v1/user/admin/dashboard";
+                } else if (role === 2) {
+                  // Bác sĩ
+                  window.location.href = "/api/v1/user/doctor/dashboard";
+                } else if (role === 3) {
+                  // Người dùng (bệnh nhân)
+                  window.location.href = "/api/v1/user/";
+                } else {
+                  // Nếu không phải là một trong các role trên, chuyển về trang chủ
+                  window.location.href = "/";
+                }
+              } else {
+                messageDiv
+                  .removeClass("alert-success")
+                  .addClass("alert-danger");
+                messageDiv.text("Lỗi: Không nhận được token");
+              }
+            },
+            error: function (xhr) {
+              messageDiv.removeClass("alert-success").addClass("alert-danger");
+              messageDiv.text(`Lỗi: ${xhr.responseText}`);
+            },
+          });
         });
+      });
     </script>
-</body>
-
+  </body>
 </html>

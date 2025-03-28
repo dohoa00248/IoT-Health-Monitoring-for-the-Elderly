@@ -1,5 +1,16 @@
 $(document).ready(function () {
   const ws = new WebSocket("ws://192.168.2.127:3000");
+  ws.onmessage = function (event) {
+    const healthData = JSON.parse(event.data);
+    console.log(healthData);
+    if (healthData && healthData.deviceID) {
+      updateHealthDataInTable(healthData);
+      const timestamp = moment().format("HH:mm:ss");
+      updateCharts(healthData, timestamp);
+    } else {
+      console.warn("Invalid health data received");
+    }
+  };
 
   let heartRateData = {
     labels: [],
@@ -58,18 +69,24 @@ $(document).ready(function () {
     data: ambientTempData,
   });
 
-  ws.onmessage = function (event) {
-    const healthData = JSON.parse(event.data);
-    console.log(healthData); // In ra dữ liệu nhận được từ WebSocket
+  function updateHealthDataInTable(data) {
+    $("#deviceID").text(data.deviceID || "N/A");
+    $("#heartBeat").text(data.heartBeat || "0 BPM");
+    $("#spo2").text(data.spo2 || "0%");
+    $("#bodyTemp").text(data.bodyTemp || "N/A");
+    $("#ambientTemp").text(data.ambientTemp || "N/A");
 
-    if (healthData && healthData.deviceID) {
-      updateHealthDataInTable(healthData);
-      const timestamp = moment().format("HH:mm:ss");
-      updateCharts(healthData, timestamp);
+    if (
+      Array.isArray(data.healthDiagnosis) &&
+      data.healthDiagnosis.length > 0
+    ) {
+      $("#healthDiagnosis").text(data.healthDiagnosis.join(", "));
     } else {
-      console.warn("Invalid health data received");
+      $("#healthDiagnosis").text("N/A");
     }
-  };
+
+    $("#healthStatus").text(data.healthStatus || "N/A");
+  }
 
   function updateCharts(healthData, timestamp) {
     heartRateData.labels.push(timestamp);
@@ -105,25 +122,6 @@ $(document).ready(function () {
     spO2Chart.update();
     bodyTempChart.update();
     ambientTempChart.update();
-  }
-
-  function updateHealthDataInTable(data) {
-    $("#deviceID").text(data.deviceID || "N/A");
-    $("#heartBeat").text(data.heartBeat || "0 BPM");
-    $("#spo2").text(data.spo2 || "0%");
-    $("#bodyTemp").text(data.bodyTemp || "N/A"); // Sửa lại đây, đảm bảo lấy đúng tên trường
-    $("#ambientTemp").text(data.ambientTemp || "N/A");
-
-    if (
-      Array.isArray(data.healthDiagnosis) &&
-      data.healthDiagnosis.length > 0
-    ) {
-      $("#healthDiagnosis").text(data.healthDiagnosis.join(", "));
-    } else {
-      $("#healthDiagnosis").text("N/A");
-    }
-
-    $("#healthStatus").text(data.healthStatus || "N/A");
   }
 
   $("#viewHistoryBtn").click(function () {
@@ -187,15 +185,5 @@ $(document).ready(function () {
 
   $("#backButton").click(function () {
     window.history.back();
-  });
-
-  //link chuyen huong
-  $("#addPatientBtn").click(function () {
-    // Chuyển hướng đến trang tạo hồ sơ bệnh nhân
-    window.location.href = "/api/v1/user/addpatient-doctor"; // Thay đổi URL cho phù hợp
-  });
-  $("#logoutButton").click(function () {
-    localStorage.removeItem("token");
-    window.location.href = "/api/v1/auth";
   });
 });
