@@ -16,9 +16,9 @@
 // #define WIFI_SSID "Wifi chùa"
 // #define WIFI_PASSWORD "9999999990"
 
-// DNS Google (8.8.8.8 và 8.8.4.4)
-IPAddress dns1(8, 8, 8, 8);
-IPAddress dns2(8, 8, 4, 4);
+// // DNS Google (8.8.8.8 và 8.8.4.4)
+// IPAddress dns1(8, 8, 8, 8);
+// IPAddress dns2(8, 8, 4, 4);
 
 // Địa chỉ I2C và các cảm biến
 #define I2C_ADDRESS 0x57
@@ -37,8 +37,8 @@ int ledHighTemp = 26;
 
 // Thông tin WebSocket server
 // const char* websocketServer = "iot-health-monitoring-for-the-elderly.onrender.com";  // Địa chỉ WebSocket server
-// const char* websocketServer = "ws://iot-health-monitoring-for-the-elderly.onrender.com";  // Địa chỉ WebSocket server
-const char* websocketServer = "ws://192.168.2.127";  // Địa chỉ WebSocket server
+const char* websocketServer = "ws://iot-health-monitoring-for-the-elderly.onrender.com";  // Địa chỉ WebSocket server
+// const char* websocketServer = "ws://192.168.2.127";  // Địa chỉ WebSocket server
 // const char* websocketServer = "192.168.65.58";  // Địa chỉ WebSocket server
 // const char* websocketServer = "192.168.2.127";  // Địa chỉ WebSocket server
 
@@ -66,7 +66,7 @@ void setup() {
 
   // Kết nối Wi-Fi
   // Cấu hình DNS và kết nối Wi-Fi
-  WiFi.config(INADDR_NONE, INADDR_NONE, dns1, dns2);  // Đặt DNS 8.8.8.8 và 8.8.4.4
+  // WiFi.config(INADDR_NONE, INADDR_NONE, dns1, dns2);  // Đặt DNS 8.8.8.8 và 8.8.4.4
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
