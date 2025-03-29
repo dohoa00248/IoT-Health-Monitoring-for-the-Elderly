@@ -62,7 +62,6 @@ const setupWebSocketServer = (server) => {
 
       try {
         const data = JSON.parse(message);
-
         console.log("Parsed data:", data);
 
         // const healthDiagnosis = diagnoseHealth(
