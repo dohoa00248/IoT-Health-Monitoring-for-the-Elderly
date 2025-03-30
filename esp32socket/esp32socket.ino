@@ -9,12 +9,14 @@
 
 // Cấu hình Wi-Fi
 
-#define WIFI_SSID "DTH 999"
-#define WIFI_PASSWORD "9999999990"
-
-
-// #define WIFI_SSID "Wifi chùa"
+// #define WIFI_SSID "DTH 999"
 // #define WIFI_PASSWORD "9999999990"
+
+// #define WIFI_SSID "Sparta.inc_5G"
+// #define WIFI_PASSWORD "Dochua2023"
+
+#define WIFI_SSID "Wifi chùa"
+#define WIFI_PASSWORD "9999999990"
 
 // // DNS Google (8.8.8.8 và 8.8.4.4)
 // IPAddress dns1(8, 8, 8, 8);
@@ -37,15 +39,15 @@ int ledHighTemp = 26;
 
 // Thông tin WebSocket server
 // const char* websocketServer = "iot-health-monitoring-for-the-elderly.onrender.com";  // Địa chỉ WebSocket server
-const char* websocketServer = "ws://iot-health-monitoring-for-the-elderly.onrender.com";  // Địa chỉ WebSocket server
+// const char* websocketServer = "ws://iot-health-monitoring-for-the-elderly.onrender.com";  // Địa chỉ WebSocket server
 // const char* websocketServer = "ws://192.168.2.127";  // Địa chỉ WebSocket server
-// const char* websocketServer = "192.168.65.58";  // Địa chỉ WebSocket server
-// const char* websocketServer = "192.168.2.127";  // Địa chỉ WebSocket server
 
-// const int port = 3000;
+const char* websocketServer = "192.168.65.58";  // Địa chỉ WebSocket server
+
+const int port = 3000;
 // const int port = 10000;
 // const int port = 8080;
-const int port = 443;
+// const int port = 443;
 WebSocketsClient webSocket;
 
 // String patientID = "P01";
