@@ -1,8 +1,8 @@
 $(document).ready(function () {
-  // const ws = new WebSocket("ws://192.168.2.127:3000");
-  const ws = new WebSocket(
-    "wss://iot-health-monitoring-for-the-elderly.onrender.com"
-  );
+  const ws = new WebSocket("ws://192.168.65.58:3000");
+  // const ws = new WebSocket(
+  //   "wss://iot-health-monitoring-for-the-elderly.onrender.com"
+  // );
   ws.onmessage = function (event) {
     const healthData = JSON.parse(event.data);
     console.log(healthData);
@@ -78,7 +78,6 @@ $(document).ready(function () {
     $("#spo2").text(data.spo2 || "0%");
     $("#bodyTemp").text(data.bodyTemp || "N/A");
     $("#ambientTemp").text(data.ambientTemp || "N/A");
-
     if (
       Array.isArray(data.healthDiagnosis) &&
       data.healthDiagnosis.length > 0

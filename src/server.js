@@ -1,7 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
 import http from "http";
-import { WebSocketServer } from "ws";
 import configViewEngine from "./config/view.engine.js";
 import parseJson from "./middleware/parseJsonMiddleware.js";
 import setupMethodOverride from "./middleware/methodOverrideMiddleware.js";
@@ -10,11 +9,7 @@ import connectDB from "./config/db.connect.js";
 import configStaticFolders from "./config/static.folder.js";
 import cookieParser from "cookie-parser";
 import corsMiddleware from "./middleware/corsMiddleware.js";
-
-import HealthData from "./models/HealthData.js";
 import setupWebSocketServer from "./config/websocket.js";
-// import https from 'https';
-// import fs from 'fs';
 
 // Khởi tạo app Express
 const app = express();
@@ -49,7 +44,6 @@ app.use(cookieParser());
 // Định nghĩa các routes
 webRoutes(app);
 
-// Cấu hình và chạy server
 const PORT = process.env.PORT || 3000;
 const HOSTNAME = process.env.HOST_NAME || "localhost";
 
