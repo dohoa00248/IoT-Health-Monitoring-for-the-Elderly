@@ -1,6 +1,6 @@
-// // Biến để lưu trữ giá trị trước đó của nhịp tim và SpO2
-// let lastHeartRate = null;
-// let lastSpO2 = null;
+// Biến để lưu trữ giá trị trước đó của nhịp tim và SpO2
+let lastHeartRate = null;
+let lastSpO2 = null;
 // Các ngưỡng để chẩn đoán sức khỏe
 const lowHeartRate = 60;
 const highHeartRate = 80;

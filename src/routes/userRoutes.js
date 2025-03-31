@@ -5,6 +5,7 @@ import userController from "../controllers/userController.js";
 import HealthData from "../models/HealthData.js";
 
 import authenticateToken from "../middleware/authMiddleware.js";
+import { populate } from "dotenv";
 
 const router = express.Router();
 
@@ -214,10 +215,14 @@ router.get("/patients/:doctorId", async (req, res) => {
     const { doctorId } = req.params; // Lấy doctorId từ URL parameter
 
     // Lấy thông tin bác sĩ từ database, với thông tin bệnh nhân liên kết
-    const doctor = await User.findById(doctorId).populate(
-      "patients",
-      "firstName lastName email healthData"
-    );
+    const doctor = await User.findById(doctorId).populate({
+      path: "patients",
+      select: "firstName lastName email healthData", // Lấy các trường bệnh nhân cần thiết
+      populate: {
+        path: "healthData",
+        select: "healthStatus deviceID ambientTemp heartBeat spo2 bodyTemp", // Lấy các chỉ số sức khỏe từ healthData
+      },
+    });
 
     if (!doctor || doctor.role !== 2) {
       // Kiểm tra xem có phải là bác sĩ không
@@ -226,9 +231,9 @@ router.get("/patients/:doctorId", async (req, res) => {
         .json({ message: "Bác sĩ không tồn tại hoặc không đúng" });
     }
 
-    // Trả về danh sách bệnh nhân của bác sĩ
+    // Trả về danh sách bệnh nhân của bác sĩ với đầy đủ thông tin sức khỏe
     res.status(200).json({
-      patients: doctor.patients, // Dữ liệu bệnh nhân sẽ được chứa trong doctor.patients
+      patients: doctor.patients, // Dữ liệu bệnh nhân với thông tin healthData đầy đủ
     });
   } catch (error) {
     console.error(error);

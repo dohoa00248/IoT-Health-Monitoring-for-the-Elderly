@@ -227,6 +227,12 @@
                 <tr>
                   <th>Tên Bệnh Nhân</th>
                   <th>Email</th>
+                  <th>deviceID</th>
+                  <th>heartBeat</th>
+                  <th>spo2</th>
+                  <th>bodyTemp</th>
+                  <th>Ambient Temp</th>
+                  <th>healthStatus</th>
                 </tr>
               </thead>
               <tbody>
@@ -297,10 +303,45 @@
 
                   // Điền dữ liệu bệnh nhân vào bảng
                   patients.forEach(function (patient) {
+                    var deviceID =
+                      patient.healthData.length > 0
+                        ? patient.healthData[0].deviceID
+                        : "Không xác định";
+                    var heartBeat =
+                      patient.healthData.length > 0
+                        ? patient.healthData[0].heartBeat
+                        : "Không xác định";
+                    var spo2 =
+                      patient.healthData.length > 0
+                        ? patient.healthData[0].spo2
+                        : "Không xác định";
+                    var bodyTemp =
+                      patient.healthData.length > 0
+                        ? patient.healthData[0].bodyTemp
+                        : "Không xác định";
+
+                    var ambientTemp =
+                      patient.healthData.length > 0
+                        ? patient.healthData[0].ambientTemp
+                        : "Không xác định";
+
+                    // Lấy healthStatus từ mảng healthData (giả sử chỉ có một bản ghi healthData)
+                    var healthStatus =
+                      patient.healthData.length > 0
+                        ? patient.healthData[0].healthStatus
+                        : "Không xác định";
+
                     var row = `<tr>
-                <td>${patient.firstName} ${patient.lastName}</td>
-                <td>${patient.email}</td>
-              </tr>`;
+                      <td>${patient.firstName} ${patient.lastName}</td>
+                      <td>${patient.email}</td>
+                      <td>${deviceID}</td>
+                      <td>${heartBeat}</td>
+                      <td>${spo2}</td>
+                      <td>${bodyTemp}</td>
+                      <td>${ambientTemp}</td>
+                      <td>${healthStatus}</td>
+                      
+                      </tr>`;
                     patientsTableBody.append(row);
                   });
 
