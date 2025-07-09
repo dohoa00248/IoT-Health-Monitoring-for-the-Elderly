@@ -1,15 +1,15 @@
-import express from "express";
-import dotenv from "dotenv";
-import http from "http";
-import configViewEngine from "./config/view.engine.js";
-import parseJson from "./middleware/parseJsonMiddleware.js";
-import setupMethodOverride from "./middleware/methodOverrideMiddleware.js";
-import webRoutes from "./routes/web.js";
-import connectDB from "./config/db.connect.js";
-import configStaticFolders from "./config/static.folder.js";
-import cookieParser from "cookie-parser";
-import corsMiddleware from "./middleware/corsMiddleware.js";
-import setupWebSocketServer from "./config/websocket.js";
+import express from 'express';
+import dotenv from 'dotenv';
+import http from 'http';
+import configViewEngine from './config/view.engine.js';
+import parseJson from './middleware/parseJsonMiddleware.js';
+import setupMethodOverride from './middleware/methodOverrideMiddleware.js';
+import webRoutes from './routes/web.js';
+import connectDB from './config/db.connect.js';
+import configStaticFolders from './config/static.folder.js';
+import cookieParser from 'cookie-parser';
+import corsMiddleware from './middleware/corsMiddleware.js';
+import setupWebSocketServer from './config/websocket.js';
 
 // Khởi tạo app Express
 const app = express();
@@ -45,9 +45,8 @@ app.use(cookieParser());
 webRoutes(app);
 
 const PORT = process.env.PORT || 3000;
-const HOSTNAME = process.env.HOST_NAME || "localhost";
 
 // Bắt đầu server và lắng nghe kết nối
-server.listen(PORT, HOSTNAME, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

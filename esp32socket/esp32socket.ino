@@ -12,11 +12,11 @@
 // #define WIFI_SSID "DTH 999"
 // #define WIFI_PASSWORD "9999999990"
 
-// #define WIFI_SSID "Sparta.inc_5G"
-// #define WIFI_PASSWORD "Dochua2023"
+#define WIFI_SSID "Sparta.inc_5G"
+#define WIFI_PASSWORD "Dongtienthisai"
 
-#define WIFI_SSID "Wifi chùa"
-#define WIFI_PASSWORD "9999999990"
+// #define WIFI_SSID "Wifi chùa"
+// #define WIFI_PASSWORD "9999999990"
 
 // // DNS Google (8.8.8.8 và 8.8.4.4)
 // IPAddress dns1(8, 8, 8, 8);
