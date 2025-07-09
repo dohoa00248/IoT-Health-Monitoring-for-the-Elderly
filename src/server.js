@@ -47,6 +47,6 @@ webRoutes(app);
 const PORT = process.env.PORT || 3000;
 
 // Bắt đầu server và lắng nghe kết nối
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
 });
